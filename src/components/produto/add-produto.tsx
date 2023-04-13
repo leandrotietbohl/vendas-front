@@ -2,7 +2,7 @@ import { Component, ChangeEvent } from "react";
 import { Link } from "react-router-dom";
 import ProdutoService from "../../services/produto.service";
 import ProdutoDTO from "../../types/produto.type";
-import { Select , MenuItem } from "@material-ui/core";
+import { Select , MenuItem, SelectChangeEvent } from "@mui/material";
 
 type Props = {};
 
@@ -47,7 +47,7 @@ export default class AddProduto extends Component<Props, State> {
         });
     }
 
-    onChangeTipoMedida(event: ChangeEvent<{ name?: string | undefined; value: unknown; }>) {
+    onChangeTipoMedida(event: SelectChangeEvent<string>) {
         const tipo = event.target.value as string;
         this.setState({
             tipoMedida: tipo,

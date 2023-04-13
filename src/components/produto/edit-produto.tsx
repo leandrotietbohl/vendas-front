@@ -1,6 +1,6 @@
 import { Component, ChangeEvent } from "react";
 import { RouteComponentProps } from 'react-router-dom';
-import { Select , MenuItem } from "@material-ui/core";
+import { Select , MenuItem, SelectChangeEvent } from "@mui/material";
 
 import ProdutoService from "../../services/produto.service";
 import ProdutoDTO from "../../types/produto.type";
@@ -66,7 +66,7 @@ export default class EditProduto extends Component<Props, State> {
         });
     }
 
-    onChangeTipoMedida(event: ChangeEvent<{ name?: string | undefined; value: unknown; }>) {
+    onChangeTipoMedida(event: SelectChangeEvent<string>) {
       const tipo = event.target.value as string;
       this.setState(function (prevState) {
         return {

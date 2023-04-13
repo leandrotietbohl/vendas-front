@@ -3,8 +3,8 @@ import ProdutoService from "../../services/produto.service";
 import FilterProdutoDTO from "../../types/produto-filter.type";
 import ProdutoDTO from "../../types/produto.type";
 import { Link } from "react-router-dom";
-import Pagination from "@material-ui/lab/Pagination";
-import { Select , MenuItem } from "@material-ui/core";
+import Pagination from "@mui/lab/Pagination";
+import { Select , MenuItem, SelectChangeEvent } from "@mui/material";
 
 type Props = {};
 
@@ -91,7 +91,7 @@ export default class ProdutoList extends Component<Props, State> {
         );
       }
     
-      handlePageSizeChange(event: ChangeEvent<{ name?: string | undefined; value: unknown; }>) {
+      handlePageSizeChange(event: SelectChangeEvent<number>) {
         const pageSize = event.target.value as number;
         this.setState(
           {
