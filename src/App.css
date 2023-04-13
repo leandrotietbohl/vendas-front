@@ -22,11 +22,14 @@
   text-align: center;
 }
 
+.titulo-venda {
+  text-align: center;
+}
+
 #flex {
   display: flex;
   flex-flow: row wrap;
 }
-
 
 .item {
   width: 100px;

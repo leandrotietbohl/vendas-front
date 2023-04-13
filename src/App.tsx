@@ -7,6 +7,7 @@ import AddProduto from "./components/produto/add-produto";
 import ProdutoList from "./components/produto/list-produto";
 import EditProduto from "./components/produto/edit-produto";
 import AddVenda from "./components/venda/add-venda";
+import VendaList from "./components/venda/list-venda";
 
 class App extends Component {
   render() {
@@ -27,6 +28,11 @@ class App extends Component {
                 Produtos
               </Link>
             </li>
+            <li className="nav-item">
+              <Link to={"/list_vendas"} className="nav-link">
+                Vendas
+              </Link>
+            </li>
           </div>
         </nav>
 
@@ -34,6 +40,7 @@ class App extends Component {
           <Switch>
             <Route exact path={["/", "/add_venda"]} component={AddVenda} />
             <Route exact path="/list_produto" component={ProdutoList} />
+            <Route exact path="/list_vendas" component={VendaList} />
             <Route exact path="/add_produto" component={AddProduto} />
             <Route path="/list_produto/:id" component={EditProduto} />
           </Switch>

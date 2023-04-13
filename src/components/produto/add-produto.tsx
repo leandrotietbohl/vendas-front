@@ -24,7 +24,7 @@ export default class AddProduto extends Component<Props, State> {
             uid: "",
             nome: "",
             valor: 0,
-            tipoMedida: "",
+            tipoMedida: "Unidade",
             submitted: false,
         };
     }
@@ -79,7 +79,7 @@ export default class AddProduto extends Component<Props, State> {
             uid: "",
             nome: "",
             valor: 0,
-            tipoMedida: "",
+            tipoMedida: "Unidade",
             submitted: false
         });
     }
@@ -89,6 +89,7 @@ export default class AddProduto extends Component<Props, State> {
 
         return (
             <div className="submit-form">
+                <h2>Cadastrar produto</h2>
                 {submitted ? (
                     <div>
                         <h4>Produto enviado com sucesso!</h4>

@@ -129,7 +129,7 @@ export default class EditProduto extends Component<Props, State> {
           <div>
             {currentProduto ? (
               <div className="edit-form">
-                <h4>Produto</h4>
+                <h4>Editar Produto</h4>
                 <form>
                   <div className="form-group">
                     <label htmlFor="title">ID</label>

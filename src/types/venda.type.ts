@@ -9,5 +9,5 @@ export default interface VendaDTO {
     valorPago: number,
     valorTroco: number,
     formaPagamento: string,
-    create: Date,
+    create: string,
   }

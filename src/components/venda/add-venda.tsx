@@ -6,6 +6,7 @@ import VendaItemDTO from "../../types/vendaItem.type";
 import DeleteIcon from '@mui/icons-material/Delete';
 import VendaService from "../../services/venda.service";
 import { Select , MenuItem, SelectChangeEvent } from "@mui/material";
+import moment, { Moment } from 'moment';
 
 type Props = {};
 
@@ -37,8 +38,8 @@ export default class AddVenda extends Component<Props, State> {
             submitted: false,
             currentIndex: -1,
             currentItem: null,
-            create: new Date,
-            formaPagamento: "",
+            create: "",
+            formaPagamento: "Dinheiro",
             valorPago: 0,
             valorTroco: 0,
         };
@@ -108,6 +109,7 @@ export default class AddVenda extends Component<Props, State> {
         this.setState({
             itens: list,
             valorTotal: sum,
+            valorPago: sum,
             currentItem: null,
             currentIndex: -1,
         })
@@ -143,14 +145,16 @@ export default class AddVenda extends Component<Props, State> {
     }
 
     finalizarVenda() {
+        const stringDate = moment(new Date()).format('yyyy-MM-DDTHH:mm:ss');
+        console.log(stringDate);
         const data: VendaDTO = {
             itens: this.state.itens,
             valorDesconto: this.state.valorDesconto,
             valorTotal: this.state.valorTotal,
-            create: new Date,
+            create: stringDate,
             formaPagamento: this.state.formaPagamento,
-            valorPago: 0,
-            valorTroco: 0,
+            valorPago: this.state.valorPago,
+            valorTroco: this.state.valorTroco,
         };
 
         console.log(data);
@@ -175,7 +179,7 @@ export default class AddVenda extends Component<Props, State> {
             itens: [],
             valorDesconto: 0,
             valorTotal: 0,
-            formaPagamento: "",
+            formaPagamento: "Dinheiro",
             valorPago: 0,
             valorTroco: 0,
             currentIndex: -1,
@@ -189,7 +193,8 @@ export default class AddVenda extends Component<Props, State> {
             currentItem, itens, valorTotal, formaPagamento, valorPago, valorTroco } = this.state;
 
         return (
-            <div className="row">
+            <div>
+                <h2 className="titulo-venda">Cadastrar venda</h2>
                 {submitted ? (
                     <div>
                         <h4>Venda efetuada com sucesso!</h4>
@@ -276,7 +281,7 @@ export default class AddVenda extends Component<Props, State> {
                                 </div>
                                 )}
                                 <button
-                                    className="badge badge-success mr-2"
+                                    className="btn btn-success mt-3"
                                     onClick={this.adicionarItem}
                                     >
                                     Adicionar Item
@@ -334,7 +339,8 @@ export default class AddVenda extends Component<Props, State> {
                                 onChange={this.onChangeFormaPagamento}
                             >
                                 <MenuItem value={"Dinheiro"}>Dinheiro</MenuItem>
-                                <MenuItem value={"Cartão"}>Cartão</MenuItem>
+                                <MenuItem value={"Debito"}>Debito</MenuItem>
+                                <MenuItem value={"Credito"}>Credito</MenuItem>
                                 <MenuItem value={"PIX"}>PIX</MenuItem>
                             </Select>
                         </div>
