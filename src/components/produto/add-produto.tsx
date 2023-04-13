@@ -146,7 +146,7 @@ export default class AddProduto extends Component<Props, State> {
                             >
                                 <MenuItem value={"Unidade"}>Unidade</MenuItem>
                                 <MenuItem value={"Kilograma"}>Kilograma</MenuItem>
-                                <MenuItem value={"Litro"}>Litro</MenuItem>
+                                <MenuItem value={"Aleatorio"}>Aleatorio</MenuItem>
                             </Select>
                         </div>
                         <Link

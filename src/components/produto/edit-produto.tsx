@@ -172,7 +172,7 @@ export default class EditProduto extends Component<Props, State> {
                           onChange={this.onChangeTipoMedida} >
                           <MenuItem value={"Unidade"}>Unidade</MenuItem>
                           <MenuItem value={"Kilograma"}>Kilograma</MenuItem>
-                          <MenuItem value={"Litro"}>Litro</MenuItem>
+                          <MenuItem value={"Aleatorio"}>Aleatorio</MenuItem>
                       </Select>
                   </div>
                 </form>

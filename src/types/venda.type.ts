@@ -6,4 +6,8 @@ export default interface VendaDTO {
     itens: Array<VendaItemDTO>,
     valorDesconto: number,
     valorTotal: number,
+    valorPago: number,
+    valorTroco: number,
+    formaPagamento: string,
+    create: Date,
   }

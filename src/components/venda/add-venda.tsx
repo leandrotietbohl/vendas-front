@@ -4,6 +4,8 @@ import ProdutoDTO from "../../types/produto.type";
 import ProdutoService from "../../services/produto.service";
 import VendaItemDTO from "../../types/vendaItem.type";
 import DeleteIcon from '@mui/icons-material/Delete';
+import VendaService from "../../services/venda.service";
+import { Select , MenuItem, SelectChangeEvent } from "@mui/material";
 
 type Props = {};
 
@@ -21,8 +23,11 @@ export default class AddVenda extends Component<Props, State> {
         this.newVenda = this.newVenda.bind(this);
         this.adicionarItem = this.adicionarItem.bind(this)
         this.onChangeQuantidade = this.onChangeQuantidade.bind(this);
+        this.onChangeValorItem= this.onChangeValorItem.bind(this);
         this.finalizarVenda = this.finalizarVenda.bind(this);
         this.removeItem = this.removeItem.bind(this);
+        this.onChangeFormaPagamento = this.onChangeFormaPagamento.bind(this);
+        this.onChangeValorPago = this.onChangeValorPago.bind(this);
 
         this.state = {
             itens: [],
@@ -32,6 +37,10 @@ export default class AddVenda extends Component<Props, State> {
             submitted: false,
             currentIndex: -1,
             currentItem: null,
+            create: new Date,
+            formaPagamento: "",
+            valorPago: 0,
+            valorTroco: 0,
         };
     }
 
@@ -56,8 +65,8 @@ export default class AddVenda extends Component<Props, State> {
     setActiveProduto(produto: ProdutoDTO, index: number) {
         const item = {
             produto: produto,
-            quantidade: 1,
-            valorItem: produto.valor
+            quantidade: produto.tipoMedida === "Kilograma" ? 0 : 1,
+            valorItem: produto.tipoMedida === "Kilograma" ? 0 : produto.valor,
         };
         this.setState({
           currentItem: item,
@@ -70,6 +79,17 @@ export default class AddVenda extends Component<Props, State> {
         if (item) {
             item.quantidade = e.target.valueAsNumber;
             item.valorItem = item.produto.valor * item.quantidade;
+        }
+        this.setState({
+            currentItem: item,
+        });
+    }
+
+    onChangeValorItem(e: ChangeEvent<HTMLInputElement>) {
+        const item = this.state.currentItem;
+        if (item) {
+            item.valorItem = e.target.valueAsNumber;
+            item.quantidade = 1;
         }
         this.setState({
             currentItem: item,
@@ -93,25 +113,71 @@ export default class AddVenda extends Component<Props, State> {
         })
     }
 
-    removeItem(index: number) {
+    removeItem(index: number, item: VendaItemDTO) {
         const list = this.state.itens;
+        const valorTotal = this.state.valorTotal - item.valorItem;
 
         list.splice(index, 1);
         this.setState({
             itens: list,
+            valorTotal: valorTotal,
         })
     }
 
+    onChangeFormaPagamento(event: SelectChangeEvent<string>) {
+        const tipo = event.target.value as string;
+        const valorTotal = this.state.valorTotal;
+        this.setState({
+            formaPagamento: tipo,
+            valorPago: valorTotal,
+            valorTroco: 0,
+        });
+    }
+
+    onChangeValorPago(e: ChangeEvent<HTMLInputElement>) {
+        const valorTotal = this.state.valorTotal;
+        this.setState({
+            valorPago: e.target.valueAsNumber,
+            valorTroco: e.target.valueAsNumber - valorTotal,
+        });
+    }
+
     finalizarVenda() {
+        const data: VendaDTO = {
+            itens: this.state.itens,
+            valorDesconto: this.state.valorDesconto,
+            valorTotal: this.state.valorTotal,
+            create: new Date,
+            formaPagamento: this.state.formaPagamento,
+            valorPago: 0,
+            valorTroco: 0,
+        };
+
+        console.log(data);
+
+        VendaService.create(data)
+            .then((response: any) => {
+                this.setState({
+                    submitted: true,
+                });
+                console.log(response.data);
+            })
+            .catch((e: Error) => {
+                console.log(e);
+            });
+        this.newVenda();
 
     }
 
     newVenda() {
         this.setState({
+            uid: null,
             itens: [],
             valorDesconto: 0,
             valorTotal: 0,
-            produtos: [],
+            formaPagamento: "",
+            valorPago: 0,
+            valorTroco: 0,
             currentIndex: -1,
             currentItem: null,
             submitted: false,
@@ -120,7 +186,7 @@ export default class AddVenda extends Component<Props, State> {
 
     render() {
         const { submitted, produtos, currentIndex, 
-            currentItem, itens, valorTotal } = this.state;
+            currentItem, itens, valorTotal, formaPagamento, valorPago, valorTroco } = this.state;
 
         return (
             <div className="row">
@@ -128,69 +194,105 @@ export default class AddVenda extends Component<Props, State> {
                     <div>
                         <h4>Venda efetuada com sucesso!</h4>
                         <button className="btn btn-success" onClick={this.newVenda}>
-                            Voltar
+                            Nova compra
                         </button>
                     </div>
                 ) : (
-                    <div className="col-md-6" id="flex">
-                        {produtos &&
-                          produtos.map((produto, index) => (
-                            <div className={
-                                    "m-1 list-group-item " +
-                                    (index === currentIndex ? "active" : "")
-                                }
-                                onClick={() => this.setActiveProduto(produto, index)}>{produto.nome}</div>
-                        ))}
-                    </div>
-                    )}
-                <div className="col-md-6">
-                    {currentItem ? (
-                        <div>
-                            <h3>Produto: <strong>{currentItem.produto.nome}</strong></h3>
+                    <div className="row">
+                        <div className="col-md-6" id="flex">
+                            {produtos &&
+                            produtos.map((produto, index) => (
+                                <div className={
+                                        "m-1 list-group-item " +
+                                        (index === currentIndex ? "active" : "")
+                                    }
+                                    onClick={() => this.setActiveProduto(produto, index)}>{produto.nome}</div>
+                            ))}
+                        </div>
+                        <div className="col-md-6">
+                        {currentItem ? (
                             <div>
-                                <label>
-                                <strong>Valor:</strong>
-                                </label>{" R$ "}
-                                {currentItem.produto.valor.toLocaleString('pt-br', {minimumFractionDigits: 2})}
-                            </div>
-                            {currentItem.produto.tipoMedida === "Unidade" ? (
+                                <h3>Produto: <strong>{currentItem.produto.nome}</strong></h3>
                                 <div>
                                     <label>
-                                    <strong>Informe a Quantidade:</strong>
-                                    </label>{" "}
-                                    <input
-                                        type="number"
-                                        id="quantidade"
-                                        required
-                                        value={currentItem.quantidade}
-                                        onChange={this.onChangeQuantidade}
-                                        name="quantidade"
-                                        />
+                                    <strong>Valor:</strong>
+                                    </label>{" R$ "}
+                                    {currentItem.produto.valor.toLocaleString('pt-br', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                                 </div>
-                            ):(
-                                <div>teste</div>
-                            )}
-                            <div>
-                                <label>
-                                <strong>Valor do item:</strong>
-                                </label><strong>{" R$ "}
-                                {currentItem.valorItem.toLocaleString('pt-br', {minimumFractionDigits: 2})}</strong>
+                                {currentItem.produto.tipoMedida === "Unidade" && (
+                                    <div>
+                                        <label>
+                                        <strong>Informe a Quantidade:</strong>
+                                        </label>{" "}
+                                        <input
+                                            type="number"
+                                            id="quantidade"
+                                            required
+                                            value={currentItem.quantidade}
+                                            onChange={this.onChangeQuantidade}
+                                            name="quantidade"
+                                            />
+                                        <label>Un</label>
+                                    </div>
+                                )} 
+                                {currentItem.produto.tipoMedida === "Kilograma" && (
+                                    <div>
+                                        <label>
+                                        <strong>Informe a Quantidade:</strong>
+                                        </label>{" "}
+                                        <input
+                                            type="number"
+                                            id="quantidade"
+                                            required
+                                            value={currentItem.quantidade}
+                                            onChange={this.onChangeQuantidade}
+                                            name="quantidade"
+                                            />
+                                        <label>Kg</label>
+                                    </div>
+                                )}
+                                {currentItem.produto.tipoMedida === "Aleatorio" && (
+                                    <div>
+                                        <label>
+                                        <strong>Informe o valor:</strong>
+                                        </label>{"R$ "}
+                                        <input
+                                            type="number"
+                                            id="valor"
+                                            required
+                                            value={currentItem.valorItem}
+                                            onChange={this.onChangeValorItem}
+                                            name="valor"
+                                            />
+                                        <label></label>
+                                    </div>
+                                )}
+                                {!(currentItem.produto.tipoMedida === "Aleatorio") && (
+                                <div>
+                                    <label>
+                                    <strong>Valor do item:</strong>
+                                    </label><strong>{" R$ "}
+                                    {currentItem.valorItem.toLocaleString('pt-br', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong>
+                                </div>
+                                )}
+                                <button
+                                    className="badge badge-success mr-2"
+                                    onClick={this.adicionarItem}
+                                    >
+                                    Adicionar Item
+                                </button>
                             </div>
-                            <button
-                                className="badge badge-success mr-2"
-                                onClick={this.adicionarItem}
-                                >
-                                Adicionar Item
-                            </button>
-                        </div>
-                    ) : (
-                        <div>
-                        <br />
-                        <p>Selecione um produto...</p>
-                        </div>
-                    )}
+                        ) : (
+                            <div>
+                            <br />
+                            <p>Selecione um produto...</p>
+                            </div>
+                        )}
+                    </div>
                 </div>
-                {itens.length > 0 && (
+                    )}
+                
+                {itens.length > 0 ? (
                 <div className="col-md-10">
                     <h3>Carrinho de compras</h3>
                     <ul className="list-group">
@@ -207,10 +309,10 @@ export default class AddVenda extends Component<Props, State> {
                         <li className="list-group-item">
                             <div className="row">
                                 <div className="col-md-4">{item.produto.nome}</div>
-                                <div className="col-md-3 custom-div-valor">R$ {item.produto.valor.toLocaleString('pt-br', {minimumFractionDigits: 2})}</div>
-                                <div className="col-md-2">{item.quantidade}</div>
-                                <div className="col-md-2 custom-div-valor">R$ {item.valorItem.toLocaleString('pt-br', {minimumFractionDigits: 2})}</div>
-                                <div className="col-md-1"><DeleteIcon onClick={() => this.removeItem(index)}/></div>
+                                <div className="col-md-3 custom-div-valor">R$ {item.produto.valor.toLocaleString('pt-br', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+                                <div className="col-md-2">{item.quantidade.toLocaleString('pt-br', {minimumFractionDigits: 4, maximumFractionDigits: 4})}</div>
+                                <div className="col-md-2 custom-div-valor">R$ {item.valorItem.toLocaleString('pt-br', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+                                <div className="col-md-1"><DeleteIcon onClick={() => this.removeItem(index, item)}/></div>
                             </div>
                         </li>
                     ))}
@@ -219,13 +321,57 @@ export default class AddVenda extends Component<Props, State> {
                         <label>
                         <strong>Valor Total da compra:</strong>
                         </label><strong>{" R$ "}
-                        {valorTotal.toLocaleString('pt-br', {minimumFractionDigits: 2})}</strong>
+                        {valorTotal.toLocaleString('pt-br', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong>
+                    </div>
+                    <div className="row">
+                        <div className="col-md-4">
+                            <label htmlFor="formaPagamento">Forma de pagamento</label>
+                            <Select
+                                labelId="demo-simple-select-label"
+                                id="formaPagamento"
+                                value={formaPagamento}
+                                label="Forma de pagamento"
+                                onChange={this.onChangeFormaPagamento}
+                            >
+                                <MenuItem value={"Dinheiro"}>Dinheiro</MenuItem>
+                                <MenuItem value={"Cartão"}>Cartão</MenuItem>
+                                <MenuItem value={"PIX"}>PIX</MenuItem>
+                            </Select>
+                        </div>
+                        {formaPagamento === "Dinheiro" ? (
+                            <div className="col-md-5">
+                                <label>
+                                <strong>Valor Pago:</strong>
+                                </label>{"R$ "}
+                                <input
+                                    type="number"
+                                    id="valorPago"
+                                    required
+                                    value={valorPago}
+                                    onChange={this.onChangeValorPago}
+                                    name="valorPago"
+                                    />
+                            </div>
+                        ) : (
+                            <div className="col-md-3">
+                                <label>
+                                <strong>Valor Pago:</strong>
+                                </label><strong>{" R$ "}
+                                {valorPago.toLocaleString('pt-br', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong>
+                            </div>
+                        )}
+                            <div className="col-md-3">
+                                <label>
+                                <strong>Troco:</strong>
+                                </label><strong>{" R$ "}
+                                {valorTroco.toLocaleString('pt-br', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong>
+                            </div>
                     </div>
                     <button onClick={this.finalizarVenda} className="btn btn-success mt-3">
                         Finalizar Compra
                     </button>
                 </div>
-                )}
+                ) : (<div></div>)}
             </div>
         )
     }
