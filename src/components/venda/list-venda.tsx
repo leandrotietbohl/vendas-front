@@ -4,6 +4,11 @@ import Pagination from "@mui/lab/Pagination";
 import { Select , MenuItem, SelectChangeEvent } from "@mui/material";
 import FilterVendaDTO from "../../types/venda-filter.type";
 import VendaService from "../../services/venda.service";
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { Dayjs } from 'dayjs';
 
 type Props = {};
 
@@ -14,6 +19,8 @@ type State = {
     page: number,
     count: number,
     pageSize: number,
+    start: Dayjs | null,
+    end: Dayjs | null,
 };
 
 export default class VendaList extends Component<Props, State> {
@@ -24,12 +31,14 @@ export default class VendaList extends Component<Props, State> {
         this.handlePageChange = this.handlePageChange.bind(this);
         this.handlePageSizeChange = this.handlePageSizeChange.bind(this);
         this.setActiveVenda = this.setActiveVenda.bind(this);
+        this.onChangeStart = this.onChangeStart.bind(this);
 
         this.state = {
             vendas: [],
             currentVenda: null,
             currentIndex: -1,
-    
+            start: null,
+            end: null,
             page: 1,
             count: 0,
             pageSize: 10,
@@ -42,10 +51,10 @@ export default class VendaList extends Component<Props, State> {
 
     retrieveVendas() {
         const data: FilterVendaDTO = {
-            start: null,
-            end: null,
+            start: this.state.start ? this.state.start.toDate() : null,
+            end: this.state.end ? this.state.end.toDate() : null,
         };
-    
+        console.log(data);
         VendaService.filter(this.state.page - 1, this.state.pageSize, data)
           .then((response) => {
     
@@ -92,6 +101,18 @@ export default class VendaList extends Component<Props, State> {
         );
     }
 
+    onChangeStart(value: Dayjs | null) {
+      this.setState({
+        start: value,
+      })
+    }
+
+    onChangeEnd(value: Dayjs | null) {
+      this.setState({
+        end: value,
+      })
+    }
+
     setActiveVenda(venda: VendaDTO, index: number) {
         this.setState({
             currentVenda: venda,
@@ -107,24 +128,48 @@ export default class VendaList extends Component<Props, State> {
           page,
           count,
           pageSize,
+          start,
+          end,
         } = this.state;
     
         return (
             <div className="list row">
                 <div className="col-md-6">
-                <div className="mt-3">
-                    {"Quantidade por pagina: "}
-                      <Select
-                          labelId="demo-simple-select-label"
-                          id="pageSize"
-                          value={pageSize}
-                          label="Quantidade por pagina"
-                          onChange={this.handlePageSizeChange} >
-                          <MenuItem value={1}>1</MenuItem>
-                          <MenuItem value={5}>5</MenuItem>
-                          <MenuItem value={10}>10</MenuItem>
-                      </Select>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DemoContainer components={['DateTimePicker', 'DateTimePicker']}>
+                      <DateTimePicker
+                        label="Data de inicio"
+                        value={start}
+                        onChange={(newValue) => this.onChangeStart(newValue)}
+                      />
+                    </DemoContainer>
+                  </LocalizationProvider>
                 </div>
+                <div className="col-md-6">
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DemoContainer components={['DateTimePicker', 'DateTimePicker']}>
+                      <DateTimePicker
+                        label="Data de termino"
+                        value={end}
+                        onChange={(newValue) => this.onChangeEnd(newValue)}
+                      />
+                    </DemoContainer>
+                  </LocalizationProvider>
+                </div>
+                <div className="col-md-6">
+                    <div className="mt-3">
+                        {"Quantidade por pagina: "}
+                        <Select
+                            labelId="demo-simple-select-label"
+                            id="pageSize"
+                            value={pageSize}
+                            label="Quantidade por pagina"
+                            onChange={this.handlePageSizeChange} >
+                            <MenuItem value={1}>1</MenuItem>
+                            <MenuItem value={5}>5</MenuItem>
+                            <MenuItem value={10}>10</MenuItem>
+                        </Select>
+                    </div>
               </div>
               <div className="col-md-6">
                 <div className="mt-3">

@@ -6,7 +6,7 @@ import VendaItemDTO from "../../types/vendaItem.type";
 import DeleteIcon from '@mui/icons-material/Delete';
 import VendaService from "../../services/venda.service";
 import { Select , MenuItem, SelectChangeEvent } from "@mui/material";
-import moment, { Moment } from 'moment';
+import moment from 'moment';
 
 type Props = {};
 
@@ -162,7 +162,7 @@ export default class AddVenda extends Component<Props, State> {
         VendaService.create(data)
             .then((response: any) => {
                 this.setState({
-                    submitted: true,
+                    submitted: false,
                 });
                 console.log(response.data);
             })
@@ -209,8 +209,10 @@ export default class AddVenda extends Component<Props, State> {
                             produtos.map((produto, index) => (
                                 <div className={
                                         "m-1 list-group-item " +
-                                        (index === currentIndex ? "active" : "")
+                                        (index === currentIndex ? "active " : "") +
+                                        (produto.categoria)
                                     }
+                                    key={index}
                                     onClick={() => this.setActiveProduto(produto, index)}>{produto.nome}</div>
                             ))}
                         </div>
@@ -311,7 +313,7 @@ export default class AddVenda extends Component<Props, State> {
                             </div>
                         </li>
                     {itens.map((item, index) => (
-                        <li className="list-group-item">
+                        <li className="list-group-item" key={index}>
                             <div className="row">
                                 <div className="col-md-4">{item.produto.nome}</div>
                                 <div className="col-md-3 custom-div-valor">R$ {item.produto.valor.toLocaleString('pt-br', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>

@@ -3,4 +3,5 @@ export default interface ProdutoDTO {
   nome: string,
   valor: number,
   tipoMedida: string,
+  categoria: string,
 }

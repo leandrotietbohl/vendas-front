@@ -40,3 +40,17 @@
   padding-right: 2px;
   border-style: solid;
 }
+
+.expresso {
+  z-index: 2;
+  color: #fff;
+  background-color: #00ff48;
+  border-color: #00ff48;
+}
+
+.milk {
+  z-index: 2;
+  color: #fff;
+  background-color: #00ff48;
+  border-color: #00ff48;
+}

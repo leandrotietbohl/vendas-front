@@ -22,6 +22,7 @@ export default class EditProduto extends Component<Props, State> {
         this.onChangeNome = this.onChangeNome.bind(this);
         this.onChangeValor = this.onChangeValor.bind(this);
         this.onChangeTipoMedida = this.onChangeTipoMedida.bind(this);
+        this.onChangeCategoria = this.onChangeCategoria.bind(this);
         this.getProduto = this.getProduto.bind(this);
         this.updateProduto = this.updateProduto.bind(this);
         this.deleteProduto = this.deleteProduto.bind(this);
@@ -32,6 +33,7 @@ export default class EditProduto extends Component<Props, State> {
                 uid: null,
                 nome: "",
                 valor: 0,
+                categoria: "",
                 tipoMedida: "",
             },
             message: "",
@@ -78,6 +80,18 @@ export default class EditProduto extends Component<Props, State> {
     });
     }
 
+    onChangeCategoria(event: SelectChangeEvent<string>) {
+      const categoria = event.target.value as string;
+      this.setState(function (prevState) {
+        return {
+            currentProduto: {
+            ...prevState.currentProduto,
+            categoria: categoria,
+          },
+        };
+    });
+    }
+
     getProduto(id: string) {
         ProdutoService.get(id)
           .then((response: any) => {
@@ -92,6 +106,7 @@ export default class EditProduto extends Component<Props, State> {
     }
 
     updateProduto() {
+      console.log(this.state.currentProduto);
         ProdutoService.edit(
           this.state.currentProduto.uid,
           this.state.currentProduto
@@ -173,6 +188,23 @@ export default class EditProduto extends Component<Props, State> {
                           <MenuItem value={"Unidade"}>Unidade</MenuItem>
                           <MenuItem value={"Kilograma"}>Kilograma</MenuItem>
                           <MenuItem value={"Aleatorio"}>Aleatorio</MenuItem>
+                      </Select>
+                  </div>
+                  <div className="form-group">
+                      <label htmlFor="categoria">Categoria</label>
+                      <Select
+                          id="categoria"
+                          className="form-control"
+                          value={currentProduto.categoria}
+                          label="Categoria"
+                          onChange={this.onChangeCategoria}
+                      >
+                          <MenuItem value={"expresso"}>Expresso</MenuItem>
+                          <MenuItem value={"milk"}>Milkshake</MenuItem>
+                          <MenuItem value={"artesanal"}>Artesanal</MenuItem>
+                          <MenuItem value={"acai"}>Açai</MenuItem>
+                          <MenuItem value={"crepe"}>Crepe</MenuItem>
+                          <MenuItem value={"aleatorio"}>Aleatório</MenuItem>
                       </Select>
                   </div>
                 </form>

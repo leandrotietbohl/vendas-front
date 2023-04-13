@@ -19,12 +19,14 @@ export default class AddProduto extends Component<Props, State> {
         this.onChangeTipoMedida = this.onChangeTipoMedida.bind(this);
         this.saveProduto = this.saveProduto.bind(this);
         this.newProduto = this.newProduto.bind(this);
+        this.onChangeCategoria = this.onChangeCategoria.bind(this);
 
         this.state = {
             uid: "",
             nome: "",
             valor: 0,
             tipoMedida: "Unidade",
+            categoria: "",
             submitted: false,
         };
     }
@@ -54,12 +56,20 @@ export default class AddProduto extends Component<Props, State> {
         });
     }
 
+    onChangeCategoria(event: SelectChangeEvent<string>) {
+        const categoria = event.target.value as string;
+        this.setState({
+            categoria: categoria,
+        });
+    }
+
     saveProduto() {
         const data: ProdutoDTO = {
             uid: this.state.uid,
             nome: this.state.nome,
             valor: this.state.valor,
-            tipoMedida: this.state.tipoMedida
+            tipoMedida: this.state.tipoMedida,
+            categoria: this.state.categoria,
         };
 
         ProdutoService.create(data)
@@ -80,12 +90,13 @@ export default class AddProduto extends Component<Props, State> {
             nome: "",
             valor: 0,
             tipoMedida: "Unidade",
+            categoria: "",
             submitted: false
         });
     }
 
     render() {
-        const { submitted, uid, nome, valor, tipoMedida } = this.state;
+        const { submitted, uid, nome, valor, tipoMedida, categoria } = this.state;
 
         return (
             <div className="submit-form">
@@ -138,16 +149,31 @@ export default class AddProduto extends Component<Props, State> {
                         <div className="form-group">
                             <label htmlFor="tipo">Tipo de Medida</label>
                             <Select
-                                labelId="demo-simple-select-label"
                                 id="tipo"
                                 className="form-control"
                                 value={tipoMedida}
-                                label="Tipo de medida"
                                 onChange={this.onChangeTipoMedida}
                             >
                                 <MenuItem value={"Unidade"}>Unidade</MenuItem>
                                 <MenuItem value={"Kilograma"}>Kilograma</MenuItem>
-                                <MenuItem value={"Aleatorio"}>Aleatorio</MenuItem>
+                                <MenuItem value={"Aleatorio"}>Aleatório</MenuItem>
+                            </Select>
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="categoria">Categoria</label>
+                            <Select
+                                id="categoria"
+                                className="form-control"
+                                value={categoria}
+                                label="Categoria"
+                                onChange={this.onChangeCategoria}
+                            >
+                                <MenuItem value={"expresso"}>Expresso</MenuItem>
+                                <MenuItem value={"milk"}>Milkshake</MenuItem>
+                                <MenuItem value={"artesanal"}>Artesanal</MenuItem>
+                                <MenuItem value={"acai"}>Açai</MenuItem>
+                                <MenuItem value={"crepe"}>Crepe</MenuItem>
+                                <MenuItem value={"aleatorio"}>Aleatório</MenuItem>
                             </Select>
                         </div>
                         <Link
