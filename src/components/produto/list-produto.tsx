@@ -3,7 +3,7 @@ import ProdutoService from "../../services/produto.service";
 import FilterProdutoDTO from "../../types/produto-filter.type";
 import ProdutoDTO from "../../types/produto.type";
 import { Link } from "react-router-dom";
-import Pagination from "@mui/lab/Pagination";
+import Pagination from '@mui/material/Pagination'
 import { Select , MenuItem, SelectChangeEvent } from "@mui/material";
 
 type Props = {};
@@ -123,11 +123,11 @@ export default class ProdutoList extends Component<Props, State> {
         } = this.state;
     
         return (
-            <div className="list row">
-              <div className="col-md-6">
+            <div className="row">
+              <div className="col-6">
                 <h4>Produtos</h4>
               </div>
-              <div className="col-md-6">
+              <div className="col-6">
                 <div className="mb-3">
                     <Link
                         to={"/add_produto/"}
@@ -136,7 +136,7 @@ export default class ProdutoList extends Component<Props, State> {
                     </Link>
                   </div>
               </div>
-              <div className="col-md-12">
+              <div className="col-8">
                 <div className="input-group mb-3">
                   <input
                   type="text"
@@ -155,8 +155,8 @@ export default class ProdutoList extends Component<Props, State> {
                   </div>
                 </div>
               </div>
-              <div className="col-md-6">
-                <div className="mt-3">
+              <div className="col-4">
+                <div>
                     {"Quantidade por pagina: "}
                       <Select
                           labelId="demo-simple-select-label"
@@ -170,7 +170,7 @@ export default class ProdutoList extends Component<Props, State> {
                       </Select>
                 </div>
               </div>
-              <div className="col-md-6">
+              <div className="col-8">
                 <div className="mt-3">
                   <Pagination
                     className="my-3"
@@ -184,7 +184,7 @@ export default class ProdutoList extends Component<Props, State> {
                   />
                 </div>
               </div>
-              <div className="col-md-12">
+              <div className="col-8">
                 <ul className="list-group">
                     {produtos &&
                     produtos.map((produto, index) => (
@@ -197,8 +197,8 @@ export default class ProdutoList extends Component<Props, State> {
                         key={index}
                         >
                           <div className="row">
-                            <div className="col-md-8">{produto.nome}</div>
-                            <div className="col-md-4 custom-div-valor">R$ {produto.valor.toLocaleString('pt-br', {minimumFractionDigits: 2})}</div>
+                            <div className="col-8">{produto.nome}</div>
+                            <div className="col-4 custom-div-valor">R$ {produto.valor.toLocaleString('pt-br', {minimumFractionDigits: 2})}</div>
                           </div>
                         </li>
                       ))}
@@ -206,7 +206,7 @@ export default class ProdutoList extends Component<Props, State> {
 
                 
                 </div>
-                <div className="col-md-6">
+                <div className="col-4">
                 {currentProduto ? (
                     <div>
                     <h4>Produto</h4>

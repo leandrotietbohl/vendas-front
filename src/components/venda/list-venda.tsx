@@ -1,6 +1,6 @@
 import React, { Component, ChangeEvent } from "react";
 import VendaDTO from "../../types/venda.type";
-import Pagination from "@mui/lab/Pagination";
+import Pagination from '@mui/material/Pagination'
 import { Select , MenuItem, SelectChangeEvent } from "@mui/material";
 import FilterVendaDTO from "../../types/venda-filter.type";
 import VendaService from "../../services/venda.service";
@@ -134,8 +134,8 @@ export default class VendaList extends Component<Props, State> {
         } = this.state;
     
         return (
-            <div className="list row">
-                <div className="col-md-6">
+            <div className="row">
+                <div className="col-4">
                   <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={'en-gb'}>
                       <DateTimePicker
                         label="Data de inicio"
@@ -144,8 +144,8 @@ export default class VendaList extends Component<Props, State> {
                       />
                   </LocalizationProvider>
                 </div>
-                <div className="col-md-6">
-                <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={'en-gb'}>
+                <div className="col-4">
+                  <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={'en-gb'}>
                       <DateTimePicker
                         label="Data de termino"
                         value={end}
@@ -153,8 +153,8 @@ export default class VendaList extends Component<Props, State> {
                       />
                   </LocalizationProvider>
                 </div>
-                <div className="col-md-6">
-                    <div className="mt-3">
+                <div className="col-4">
+                    <div>
                         {"Quantidade por pagina: "}
                         <Select
                             labelId="demo-simple-select-label"
@@ -168,7 +168,7 @@ export default class VendaList extends Component<Props, State> {
                         </Select>
                     </div>
               </div>
-              <div className="col-md-6">
+              <div className="col-8">
                 <div className="mt-3">
                   <Pagination
                     className="my-3"
@@ -182,14 +182,15 @@ export default class VendaList extends Component<Props, State> {
                   />
                 </div>
               </div>
-              <div className="col-md-12">
+              <div className="col-4"></div>
+              <div className="col-8">
                 <ul className="list-group">
                     <li className="list-group-item">
                         <div className="row">
-                            <div className="col-md-4"><strong>Data</strong></div>
-                            <div className="col-md-2"><strong>Itens</strong></div>
-                            <div className="col-md-2"><strong>Forma de Pagamento</strong></div>
-                            <div className="col-md-2 custom-div-valor"><strong>Valor Total</strong></div>
+                            <div className="col-4"><strong>Data</strong></div>
+                            <div className="col-2"><strong>Itens</strong></div>
+                            <div className="col-2"><strong>Forma de Pagamento</strong></div>
+                            <div className="col-2 custom-div-valor"><strong>Valor Total</strong></div>
                         </div>
                     </li>
                     {vendas &&
@@ -203,16 +204,16 @@ export default class VendaList extends Component<Props, State> {
                         key={index}
                         >
                           <div className="row">
-                            <div className="col-md-4">{new Date(venda.create).toLocaleString()}</div>
-                            <div className="col-md-2">{venda.itens.length}</div>
-                            <div className="col-md-2">{venda.formaPagamento}</div>
-                            <div className="col-md-2 custom-div-valor">R$ {venda.valorTotal.toLocaleString('pt-br', {minimumFractionDigits: 2})}</div>
+                            <div className="col-4">{new Date(venda.create).toLocaleString()}</div>
+                            <div className="col-2">{venda.itens.length}</div>
+                            <div className="col-2">{venda.formaPagamento}</div>
+                            <div className="col-2 custom-div-valor">R$ {venda.valorTotal.toLocaleString('pt-br', {minimumFractionDigits: 2})}</div>
                           </div>
                         </li>
                       ))}
                 </ul>
               </div>
-              <div className="col-md-6">
+              <div className="col-4">
                 {currentVenda ? (
                     <div>
                         <h4>Venda</h4>

@@ -30,23 +30,20 @@
   text-align: center;
 }
 
-.titulo-venda {
+.titulo-central {
   text-align: center;
 }
 
-#flex {
-  display: flex;
-  flex-flow: row wrap;
+.custom-botao-tamanho {
+  width: 200px;
 }
 
-.item {
-  width: 100px;
-  height: 100px;
-  text-align: center;
-  font-weight: 500;
-  padding-left: 2px;
-  padding-right: 2px;
-  border-style: solid;
+.custom-select-label {
+  margin-left: 15px;
+}
+
+.custom-label-tipo {
+  vertical-align: bottom;
 }
 
 .expresso {
