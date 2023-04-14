@@ -1,4 +1,4 @@
 export default interface FilterVendaDTO {
-  start: Date | null,
-  end: Date | null,
+  start: string | null,
+  end: string | null,
 }

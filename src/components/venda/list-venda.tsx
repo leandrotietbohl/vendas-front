@@ -4,11 +4,12 @@ import Pagination from "@mui/lab/Pagination";
 import { Select , MenuItem, SelectChangeEvent } from "@mui/material";
 import FilterVendaDTO from "../../types/venda-filter.type";
 import VendaService from "../../services/venda.service";
-import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { Dayjs } from 'dayjs';
+import 'dayjs/locale/en-gb';
+import moment from "moment";
 
 type Props = {};
 
@@ -51,8 +52,8 @@ export default class VendaList extends Component<Props, State> {
 
     retrieveVendas() {
         const data: FilterVendaDTO = {
-            start: this.state.start ? this.state.start.toDate() : null,
-            end: this.state.end ? this.state.end.toDate() : null,
+            start: this.state.start ? moment(this.state.start.toDate()).format('yyyy-MM-DDTHH:mm:ss') : null,
+            end: this.state.end ? moment(this.state.end.toDate()).format('yyyy-MM-DDTHH:mm:ss') : null,
         };
         console.log(data);
         VendaService.filter(this.state.page - 1, this.state.pageSize, data)
@@ -135,25 +136,21 @@ export default class VendaList extends Component<Props, State> {
         return (
             <div className="list row">
                 <div className="col-md-6">
-                  <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DemoContainer components={['DateTimePicker', 'DateTimePicker']}>
+                  <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={'en-gb'}>
                       <DateTimePicker
                         label="Data de inicio"
                         value={start}
                         onChange={(newValue) => this.onChangeStart(newValue)}
                       />
-                    </DemoContainer>
                   </LocalizationProvider>
                 </div>
                 <div className="col-md-6">
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DemoContainer components={['DateTimePicker', 'DateTimePicker']}>
+                <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={'en-gb'}>
                       <DateTimePicker
                         label="Data de termino"
                         value={end}
                         onChange={(newValue) => this.onChangeEnd(newValue)}
                       />
-                    </DemoContainer>
                   </LocalizationProvider>
                 </div>
                 <div className="col-md-6">

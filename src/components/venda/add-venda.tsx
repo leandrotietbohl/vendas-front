@@ -222,6 +222,12 @@ export default class AddVenda extends Component<Props, State> {
                                 <h3>Produto: <strong>{currentItem.produto.nome}</strong></h3>
                                 <div>
                                     <label>
+                                    <strong>Categoria:</strong>
+                                    </label>{" "}
+                                    {currentItem.produto.categoria}
+                                </div>
+                                <div>
+                                    <label>
                                     <strong>Valor:</strong>
                                     </label>{" R$ "}
                                     {currentItem.produto.valor.toLocaleString('pt-br', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
