@@ -7,6 +7,8 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import VendaService from "../../services/venda.service";
 import { Select , MenuItem, SelectChangeEvent } from "@mui/material";
 import moment from 'moment';
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 
 type Props = {};
 
@@ -14,7 +16,8 @@ type State = VendaDTO & {
     produtos: Array<ProdutoDTO>,
     submitted: boolean,
     currentItem: VendaItemDTO | null,
-    currentIndex: number,
+    produtoID: string,
+    categorias: Array<any>,
 };
 
 export default class AddVenda extends Component<Props, State> {
@@ -29,6 +32,7 @@ export default class AddVenda extends Component<Props, State> {
         this.removeItem = this.removeItem.bind(this);
         this.onChangeFormaPagamento = this.onChangeFormaPagamento.bind(this);
         this.onChangeValorPago = this.onChangeValorPago.bind(this);
+        this.handleChangeProduto = this.handleChangeProduto.bind(this);
 
         this.state = {
             itens: [],
@@ -36,12 +40,19 @@ export default class AddVenda extends Component<Props, State> {
             valorTotal: 0,
             produtos: [],
             submitted: false,
-            currentIndex: -1,
             currentItem: null,
             create: "",
             formaPagamento: "Dinheiro",
             valorPago: 0,
             valorTroco: 0,
+            produtoID: "",
+            categorias: [
+                {id: "expresso",name: "Expresso"}, 
+                {id: "milk", name: "Milkshake"},
+                {id: "artesanal", name: "Artesanal"},
+                {id: "acai", name: "Açaí"}, 
+                {id: "crepe", name: "Crepe" }, 
+                {id: "aleatorio", name: "Aleatório"}]
         };
     }
 
@@ -61,18 +72,6 @@ export default class AddVenda extends Component<Props, State> {
           .catch((e) => {
             console.log(e);
           });
-    }
-
-    setActiveProduto(produto: ProdutoDTO, index: number) {
-        const item = {
-            produto: produto,
-            quantidade: produto.tipoMedida === "Kilograma" ? 0 : 1,
-            valorItem: produto.tipoMedida === "Kilograma" ? 0 : produto.valor,
-        };
-        this.setState({
-          currentItem: item,
-          currentIndex: index,
-        });
     }
 
     onChangeQuantidade(e: ChangeEvent<HTMLInputElement>) {
@@ -111,7 +110,7 @@ export default class AddVenda extends Component<Props, State> {
             valorTotal: sum,
             valorPago: sum,
             currentItem: null,
-            currentIndex: -1,
+            produtoID: "",
         })
     }
 
@@ -123,6 +122,8 @@ export default class AddVenda extends Component<Props, State> {
         this.setState({
             itens: list,
             valorTotal: valorTotal,
+            valorPago: valorTotal,
+            valorTroco: 0,
         })
     }
 
@@ -173,6 +174,29 @@ export default class AddVenda extends Component<Props, State> {
 
     }
 
+    handleChangeProduto(event: React.MouseEvent<HTMLElement>,
+        idProduto: string) {
+            var prod = null;
+            for (let i = 0; i < this.state.produtos.length; i++) {
+                if (this.state.produtos[i].uid === idProduto) {
+                    prod = this.state.produtos[i];
+                    break;
+                }
+            }
+            
+            if (prod) {
+                const item = {
+                    produto: prod,
+                    quantidade: prod.tipoMedida === "Kilograma" ? 0 : 1,
+                    valorItem: prod.tipoMedida === "Kilograma" ? 0 : prod.valor,
+            };
+            this.setState({
+              currentItem: item,
+              produtoID: idProduto,
+            });
+            }
+    }
+
     newVenda() {
         this.setState({
             uid: null,
@@ -182,19 +206,20 @@ export default class AddVenda extends Component<Props, State> {
             formaPagamento: "Dinheiro",
             valorPago: 0,
             valorTroco: 0,
-            currentIndex: -1,
             currentItem: null,
             submitted: false,
+            produtoID: "",
         });
     }
 
     render() {
-        const { submitted, produtos, currentIndex, 
-            currentItem, itens, valorTotal, formaPagamento, valorPago, valorTroco } = this.state;
+        const { submitted, produtos, 
+            currentItem, itens, valorTotal, formaPagamento, valorPago, valorTroco, produtoID, categorias } = this.state;
 
         return (
-            <div>
-                <h2 className="titulo-venda">Cadastrar venda</h2>
+        <div>
+            <div className="row">
+                
                 {submitted ? (
                     <div>
                         <h4>Venda efetuada com sucesso!</h4>
@@ -203,110 +228,32 @@ export default class AddVenda extends Component<Props, State> {
                         </button>
                     </div>
                 ) : (
-                    <div className="row">
-                        <div className="col-md-6" id="flex">
-                            {produtos &&
-                            produtos.map((produto, index) => (
-                                <div className={
-                                        "m-1 list-group-item " +
-                                        (index === currentIndex ? "active " : "") +
-                                        (produto.categoria)
-                                    }
-                                    key={index}
-                                    onClick={() => this.setActiveProduto(produto, index)}>{produto.nome}</div>
-                            ))}
-                        </div>
-                        <div className="col-md-6">
-                        {currentItem ? (
-                            <div>
-                                <h3>Produto: <strong>{currentItem.produto.nome}</strong></h3>
-                                <div>
-                                    <label>
-                                    <strong>Categoria:</strong>
-                                    </label>{" "}
-                                    {currentItem.produto.categoria}
-                                </div>
-                                <div>
-                                    <label>
-                                    <strong>Valor:</strong>
-                                    </label>{" R$ "}
-                                    {currentItem.produto.valor.toLocaleString('pt-br', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
-                                </div>
-                                {currentItem.produto.tipoMedida === "Unidade" && (
-                                    <div>
-                                        <label>
-                                        <strong>Informe a Quantidade:</strong>
-                                        </label>{" "}
-                                        <input
-                                            type="number"
-                                            id="quantidade"
-                                            required
-                                            value={currentItem.quantidade}
-                                            onChange={this.onChangeQuantidade}
-                                            name="quantidade"
-                                            />
-                                        <label>Un</label>
-                                    </div>
-                                )} 
-                                {currentItem.produto.tipoMedida === "Kilograma" && (
-                                    <div>
-                                        <label>
-                                        <strong>Informe a Quantidade:</strong>
-                                        </label>{" "}
-                                        <input
-                                            type="number"
-                                            id="quantidade"
-                                            required
-                                            value={currentItem.quantidade}
-                                            onChange={this.onChangeQuantidade}
-                                            name="quantidade"
-                                            />
-                                        <label>Kg</label>
-                                    </div>
-                                )}
-                                {currentItem.produto.tipoMedida === "Aleatorio" && (
-                                    <div>
-                                        <label>
-                                        <strong>Informe o valor:</strong>
-                                        </label>{"R$ "}
-                                        <input
-                                            type="number"
-                                            id="valor"
-                                            required
-                                            value={currentItem.valorItem}
-                                            onChange={this.onChangeValorItem}
-                                            name="valor"
-                                            />
-                                        <label></label>
-                                    </div>
-                                )}
-                                {!(currentItem.produto.tipoMedida === "Aleatorio") && (
-                                <div>
-                                    <label>
-                                    <strong>Valor do item:</strong>
-                                    </label><strong>{" R$ "}
-                                    {currentItem.valorItem.toLocaleString('pt-br', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong>
-                                </div>
-                                )}
-                                <button
-                                    className="btn btn-success mt-3"
-                                    onClick={this.adicionarItem}
+                    <div className="row col-6">
+                        {categorias.map((categoria) => (
+                            <div className={categoria.id === "milk" ? "titulo-venda col-5" : categoria.id === "crepe" || categoria.id === "acai"
+                                         ? "titulo-venda col-4" : "titulo-venda col-3"}>
+                                <h4 className="titulo-venda">{categoria.name}</h4>
+                                <ToggleButtonGroup
+                                    color="primary"
+                                    orientation="vertical"
+                                    value={produtoID}
+                                    className="ml-1"
+                                    exclusive
+                                    onChange={this.handleChangeProduto}
+                                    aria-label="Platform"
                                     >
-                                    Adicionar Item
-                                </button>
+                                    {produtos &&
+                                    produtos.filter(prod => prod.categoria === categoria.id).map((produto, index) => (
+                                        <ToggleButton value={produto.uid}>{produto.nome}</ToggleButton>
+                                    ))}
+                                </ToggleButtonGroup>
                             </div>
-                        ) : (
-                            <div>
-                            <br />
-                            <p>Selecione um produto...</p>
-                            </div>
-                        )}
-                    </div>
+                        ))}
+                        
                 </div>
                     )}
-                
                 {itens.length > 0 ? (
-                <div className="col-md-10">
+                <div className="col-6">
                     <h3>Carrinho de compras</h3>
                     <ul className="list-group">
                         <li className="list-group-item">
@@ -385,8 +332,90 @@ export default class AddVenda extends Component<Props, State> {
                         Finalizar Compra
                     </button>
                 </div>
-                ) : (<div></div>)}
+                ) : (<div className="col-6"></div>)}
+                <div className="col-6">
+                        {currentItem ? (
+                            <div>
+                                <h3>Produto: <strong>{currentItem.produto.nome}</strong></h3>
+                                <div>
+                                    <label>
+                                    <strong>Valor:</strong>
+                                    </label>{" R$ "}
+                                    {currentItem.produto.valor.toLocaleString('pt-br', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                                </div>
+                                {currentItem.produto.tipoMedida === "Unidade" && (
+                                    <div>
+                                        <label>
+                                        <strong>Informe a Quantidade:</strong>
+                                        </label>{" "}
+                                        <input
+                                            type="number"
+                                            id="quantidade"
+                                            required
+                                            value={currentItem.quantidade}
+                                            onChange={this.onChangeQuantidade}
+                                            name="quantidade"
+                                            />
+                                        <label>Un</label>
+                                    </div>
+                                )} 
+                                {currentItem.produto.tipoMedida === "Kilograma" && (
+                                    <div>
+                                        <label>
+                                        <strong>Informe a Quantidade:</strong>
+                                        </label>{" "}
+                                        <input
+                                            type="number"
+                                            id="quantidade"
+                                            required
+                                            value={currentItem.quantidade}
+                                            onChange={this.onChangeQuantidade}
+                                            name="quantidade"
+                                            />
+                                        <label>Kg</label>
+                                    </div>
+                                )}
+                                {currentItem.produto.tipoMedida === "Aleatorio" && (
+                                    <div>
+                                        <label>
+                                        <strong>Informe o valor:</strong>
+                                        </label>{"R$ "}
+                                        <input
+                                            type="number"
+                                            id="valor"
+                                            required
+                                            value={currentItem.valorItem}
+                                            onChange={this.onChangeValorItem}
+                                            name="valor"
+                                            />
+                                        <label></label>
+                                    </div>
+                                )}
+                                {!(currentItem.produto.tipoMedida === "Aleatorio") && (
+                                <div>
+                                    <label>
+                                    <strong>Valor do item:</strong>
+                                    </label><strong>{" R$ "}
+                                    {currentItem.valorItem.toLocaleString('pt-br', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong>
+                                </div>
+                                )}
+                                <button
+                                    className="btn btn-success mt-3"
+                                    onClick={this.adicionarItem}
+                                    >
+                                    Adicionar Item
+                                </button>
+                            </div>
+                        ) : (
+                            <div>
+                            <br />
+                            <p>Selecione um produto...</p>
+                            </div>
+                        )}
+                    </div>
+                
             </div>
+        </div>
         )
     }
 }

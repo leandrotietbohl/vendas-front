@@ -171,7 +171,7 @@ export default class AddProduto extends Component<Props, State> {
                                 <MenuItem value={"expresso"}>Expresso</MenuItem>
                                 <MenuItem value={"milk"}>Milkshake</MenuItem>
                                 <MenuItem value={"artesanal"}>Artesanal</MenuItem>
-                                <MenuItem value={"acai"}>Açai</MenuItem>
+                                <MenuItem value={"acai"}>Açaí</MenuItem>
                                 <MenuItem value={"crepe"}>Crepe</MenuItem>
                                 <MenuItem value={"aleatorio"}>Aleatório</MenuItem>
                             </Select>

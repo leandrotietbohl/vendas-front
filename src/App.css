@@ -4,6 +4,14 @@
   margin: auto;
 }
 
+.custom-container {
+  padding-left: 0px;
+  margin-left: 20px;
+  padding-right: 0px;
+  margin-right: 20px;
+  max-width: fit-content;
+}
+
 .submit-form {
   max-width: 300px;
   margin: auto;
