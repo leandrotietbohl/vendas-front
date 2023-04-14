@@ -13,6 +13,10 @@ class VendaService {
     return http.post<PageVendaDTO>(`/vendas/filter?page=${page}&size=${size}`, data);
   }
 
+  filterList(data: FilterVendaDTO) {
+    return http.post<Array<VendaDTO>>("/vendas/filter_all", data);
+  }
+
 }
 
 export default new VendaService();
