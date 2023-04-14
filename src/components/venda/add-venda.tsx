@@ -257,7 +257,7 @@ export default class AddVenda extends Component<Props, State> {
                                 ))}
                             </div>
                             {currentItem ? (
-                                <div className="row mt-2">
+                                <div className="row mt-2 ml-3">
                                     <div className="col-12">
                                         <h5>Produto: <strong>{currentItem.produto.nome}</strong></h5>
                                     </div>
