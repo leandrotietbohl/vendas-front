@@ -172,6 +172,7 @@ export default class AddVenda extends Component<Props, State> {
             formaPagamento: this.state.formaPagamento,
             valorPago: this.state.valorPago,
             valorTroco: this.state.valorTroco,
+            cliente: this.state.cliente
         };
 
         console.log(data);

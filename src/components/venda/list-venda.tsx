@@ -14,10 +14,12 @@ type Props = {};
 
 type State = {
   vendas: Array<VendaDTO>,
-  currentVenda: VendaDTO | null,
-  currentIndex: number,
   start: Dayjs | null,
   end: Dayjs | null,
+  valorSunTotal: number,
+  valorSunPago: number,
+  valorSunTroco: number,
+  currentVenda: VendaDTO | null,
 };
 
 export default class VendaList extends Component<Props, State> {
@@ -25,15 +27,17 @@ export default class VendaList extends Component<Props, State> {
     super(props);
     this.retrieveVendas = this.retrieveVendas.bind(this);
     this.refreshList = this.refreshList.bind(this);
-    this.setActiveVenda = this.setActiveVenda.bind(this);
     this.onChangeStart = this.onChangeStart.bind(this);
+    this.setActiveVenda = this.setActiveVenda.bind(this);
 
     this.state = {
       vendas: [],
       currentVenda: null,
-      currentIndex: -1,
       start: null,
       end: null,
+      valorSunTotal: 0,
+      valorSunPago: 0,
+      valorSunTroco: 0,
     };
   }
 
@@ -52,6 +56,9 @@ export default class VendaList extends Component<Props, State> {
 
         this.setState({
           vendas: response.data,
+          valorSunTotal: response.data.reduce((sum, x) => sum + x.valorTotal, 0),
+          valorSunPago: response.data.reduce((sum, x) => sum + x.valorPago, 0),
+          valorSunTroco: response.data.reduce((sum, x) => sum + x.valorTroco, 0),
         });
         console.log(response.data);
       })
@@ -62,10 +69,6 @@ export default class VendaList extends Component<Props, State> {
 
   refreshList() {
     this.retrieveVendas();
-    this.setState({
-      currentVenda: null,
-      currentIndex: -1,
-    });
   }
 
   onChangeStart(value: Dayjs | null) {
@@ -82,20 +85,21 @@ export default class VendaList extends Component<Props, State> {
     this.refreshList();
   }
 
-  setActiveVenda(venda: VendaDTO, index: number) {
+  setActiveVenda(venda: VendaDTO) {
     this.setState({
-      currentVenda: venda,
-      currentIndex: index,
+      currentVenda: venda
     });
   }
 
   render() {
     const {
       vendas,
-      currentVenda,
-      currentIndex,
       start,
       end,
+      valorSunTotal,
+      valorSunPago,
+      valorSunTroco,
+      currentVenda,
     } = this.state;
 
     return (
@@ -120,7 +124,7 @@ export default class VendaList extends Component<Props, State> {
         </div>
         <div className="col-4">
         </div>
-        <div className="col-8">
+        <div className="col-7 mt-3">
           <TableContainer component={Paper}>
             <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
               <TableHead>
@@ -136,6 +140,7 @@ export default class VendaList extends Component<Props, State> {
               <TableBody>
                 {vendas.map((venda) => (
                   <TableRow
+                    onClick={() => this.setActiveVenda(venda)}
                     key={venda.uid}
                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                   >
@@ -144,35 +149,94 @@ export default class VendaList extends Component<Props, State> {
                     </TableCell>
                     <TableCell align="right">{venda.itens.length}</TableCell>
                     <TableCell>{venda.formaPagamento}</TableCell>
-                    <TableCell align="right">{venda.valorTotal ? 
-                      'R$ ' + venda.valorTotal.toLocaleString('pt-br', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '-'}</TableCell>
-                    <TableCell align="right">{venda.valorPago ? 
-                      'R$ ' + venda.valorPago.toLocaleString('pt-br', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '-' }</TableCell>
-                    <TableCell align="right">{venda.valorTroco ? 
-                      'R$ ' + venda.valorTroco.toLocaleString('pt-br', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '-'}</TableCell>
+                    <TableCell align="right">{venda.valorTotal ?
+                      'R$ ' + venda.valorTotal.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '-'}</TableCell>
+                    <TableCell align="right">{venda.valorPago ?
+                      'R$ ' + venda.valorPago.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '-'}</TableCell>
+                    <TableCell align="right">{venda.valorTroco ?
+                      'R$ ' + venda.valorTroco.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '-'}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
           </TableContainer>
         </div>
-        <div className="col-4">
-          {currentVenda ? (
-            <div>
-              <h4>Venda</h4>
-              <div>
-                <label>
-                  <strong>ID:</strong>
-                </label>{" "}
-                {currentVenda.uid}
-              </div>
-            </div>
-          ) : (
-            <div>
-              <br />
-              <p>Selecione uma venda...</p>
-            </div>
-          )}
+        {currentVenda ? (
+          <div className="col-5">
+            <h5>Venda</h5>
+            <label>ID: {currentVenda.uid}</label><br />
+            <label>Cliente: {currentVenda.cliente}</label><br />
+            <label>Data: {new Date(currentVenda.create).toLocaleString()}</label><br />
+            <label>Itens: {currentVenda.itens.length}</label><br />
+            <TableContainer component={Paper}>
+              <Table sx={{ minWidth: 350 }} size="small" aria-label="a dense table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Produto</TableCell>
+                    <TableCell>Categoria</TableCell>
+                    <TableCell>Valor unitario</TableCell>
+                    <TableCell>Quantidade</TableCell>
+                    <TableCell>Total</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {currentVenda.itens.map((item, index) => (
+                    <TableRow
+                      key={index}
+                      sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                    >
+                      <TableCell>{item.produto.nome}</TableCell>
+                      <TableCell>{item.produto.categoria}</TableCell>
+                      <TableCell>R$ {item.produto.valor.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
+                      <TableCell>{item.quantidade}</TableCell>
+                      <TableCell>R$ {item.valorItem.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            <table>
+              <tr>
+
+              </tr>
+              {currentVenda.itens.map((item) => (
+                <tr>
+
+                </tr>
+              ))}
+            </table>
+            <label>Forma pagamento: {currentVenda.formaPagamento}</label><br />
+            <label>Total: {currentVenda.valorTotal ?
+                      'R$ ' + currentVenda.valorTotal.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '-'}</label><br />
+            <label>Pago: {currentVenda.valorPago ?
+                      'R$ ' + currentVenda.valorPago.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '-'}</label><br />
+            <label>Troco: {currentVenda.valorTroco ?
+                      'R$ ' + currentVenda.valorTroco.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '-'}</label><br />
+          </div>
+        ) : (
+          <div className="col-5">
+
+          </div>
+        )}
+        <div className="row col-12 mt-3">
+          <div className="col-4">
+            <label>
+              <strong>Total valor Vendas:</strong>
+            </label><strong>{" R$ "}
+              {valorSunTotal.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
+          </div>
+          <div className="col-4">
+            <label>
+              <strong>Total valor pago:</strong>
+            </label><strong>{" R$ "}
+              {valorSunPago.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
+          </div>
+          <div className="col-4">
+            <label>
+              <strong>Total valor troco:</strong>
+            </label><strong>{" R$ "}
+              {valorSunTroco.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
+          </div>
         </div>
       </div>
     )
