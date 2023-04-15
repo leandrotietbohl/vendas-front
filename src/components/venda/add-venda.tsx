@@ -121,7 +121,7 @@ export default class AddVenda extends Component<Props, State> {
             cliente: cliente,
             currentItem: null,
             produtoID: "",
-        })
+        });
     }
 
     removeItem(index: number, item: VendaItemDTO) {
@@ -357,6 +357,7 @@ export default class AddVenda extends Component<Props, State> {
                                                     type="number"
                                                     value={currentItem.quantidade}
                                                     onChange={this.onChangeQuantidade}
+                                                    autoFocus
                                                     InputProps={{
                                                         startAdornment: <InputAdornment position="start">Un</InputAdornment>,
                                                     }}
@@ -370,6 +371,7 @@ export default class AddVenda extends Component<Props, State> {
                                                     type="number"
                                                     value={currentItem.quantidade}
                                                     onChange={this.onChangeQuantidade}
+                                                    autoFocus
                                                     InputProps={{
                                                         startAdornment: <InputAdornment position="start">Kg</InputAdornment>,
                                                     }}
@@ -383,6 +385,7 @@ export default class AddVenda extends Component<Props, State> {
                                                     type="number"
                                                     value={currentItem.valorItem}
                                                     onChange={this.onChangeValorItem}
+                                                    autoFocus
                                                     InputProps={{
                                                         startAdornment: <InputAdornment position="start">R$</InputAdornment>,
                                                     }}
@@ -466,6 +469,7 @@ export default class AddVenda extends Component<Props, State> {
                                                 type="number"
                                                 value={valorPago}
                                                 onChange={this.onChangeValorPago}
+                                                autoFocus
                                                 InputProps={{
                                                     startAdornment: <InputAdornment position="start">R$</InputAdornment>,
                                                 }}
