@@ -9,7 +9,12 @@
   margin-left: 20px;
   padding-right: 0px;
   margin-right: 20px;
+  font-family: cursive;
   max-width: fit-content;
+}
+
+.font-pricipal {
+  font-family: cursive!important;
 }
 
 .submit-form {

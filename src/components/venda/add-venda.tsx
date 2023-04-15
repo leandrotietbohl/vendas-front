@@ -15,6 +15,7 @@ type Props = {};
 
 type State = VendaDTO & {
     produtos: Array<ProdutoDTO>,
+    vendasEmAberto: Array<VendaDTO>,
     currentItem: VendaItemDTO | null,
     produtoID: string,
     categorias: Array<any>,
@@ -35,9 +36,13 @@ export default class AddVenda extends Component<Props, State> {
         this.onChangeValorPago = this.onChangeValorPago.bind(this);
         this.handleChangeProduto = this.handleChangeProduto.bind(this);
         this.finalizaAlert = this.finalizaAlert.bind(this);
+        this.pagamentoPendente = this.pagamentoPendente.bind(this);
+        this.setActiveVenda = this.setActiveVenda.bind(this);
+        this.onChangeCliente = this.onChangeCliente.bind(this);
 
         this.state = {
             itens: [],
+            vendasEmAberto: [],
             valorDesconto: 0,
             valorTotal: 0,
             produtos: [],
@@ -100,7 +105,7 @@ export default class AddVenda extends Component<Props, State> {
 
     adicionarItem() {
         const list = this.state.itens;
-
+        const cliente = list.length > 0 ? this.state.cliente :  null;
         if (this.state.currentItem) {
             list.push(this.state.currentItem);
         }
@@ -111,6 +116,8 @@ export default class AddVenda extends Component<Props, State> {
             itens: list,
             valorTotal: sum,
             valorPago: sum,
+            valorTroco: 0,
+            cliente: cliente,
             currentItem: null,
             produtoID: "",
         })
@@ -147,6 +154,13 @@ export default class AddVenda extends Component<Props, State> {
         });
     }
 
+    onChangeCliente(e: ChangeEvent<HTMLInputElement>) {
+        this.setState({
+            cliente: e.target.value,
+        });
+
+    }
+
     finalizarVenda() {
         const stringDate = moment(new Date()).format('yyyy-MM-DDTHH:mm:ss');
         console.log(stringDate);
@@ -173,7 +187,45 @@ export default class AddVenda extends Component<Props, State> {
                 console.log(e);
             });
         this.newVenda();
+    }
 
+    setActiveVenda(venda: VendaDTO, index: number) {
+        const list = this.state.vendasEmAberto;
+        list.splice(index, 1);
+
+        this.setState({
+            vendasEmAberto: list,
+            formaPagamento: venda.formaPagamento,
+            itens: venda.itens,
+            valorDesconto: venda.valorDesconto,
+            valorTotal: venda.valorTotal,
+            valorPago: venda.valorPago,
+            valorTroco: venda.valorTroco,
+            cliente: venda.cliente,
+        });
+
+    }
+
+    pagamentoPendente() {
+        const data: VendaDTO = {
+            itens: this.state.itens,
+            valorDesconto: this.state.valorDesconto,
+            valorTotal: this.state.valorTotal,
+            create: "",
+            formaPagamento: this.state.formaPagamento,
+            valorPago: this.state.valorPago,
+            valorTroco: this.state.valorTroco,
+            cliente: this.state.cliente,
+        };
+
+        const list = this.state.vendasEmAberto;
+
+        list.push(data);
+
+        this.setState({
+            vendasEmAberto: list,
+        });
+        this.newVenda();
     }
 
     async finalizaAlert() {
@@ -221,8 +273,8 @@ export default class AddVenda extends Component<Props, State> {
     }
 
     render() {
-        const { produtos, currentItem, itens, valorTotal, formaPagamento,
-            valorPago, valorTroco, produtoID, categorias, open } = this.state;
+        const { produtos, currentItem, itens, valorTotal, formaPagamento, cliente,
+            valorPago, valorTroco, produtoID, categorias, open, vendasEmAberto } = this.state;
 
         return (
             <div>
@@ -250,7 +302,7 @@ export default class AddVenda extends Component<Props, State> {
                                         >
                                             {produtos &&
                                                 produtos.filter(prod => prod.categoria === categoria.id).map((produto, index) => (
-                                                    <ToggleButton value={produto.uid} key={index}>{produto.nome}</ToggleButton>
+                                                    <ToggleButton className="font-pricipal" value={produto.uid} key={index}>{produto.nome}</ToggleButton>
                                                 ))}
                                         </ToggleButtonGroup>
                                     </div>
@@ -278,7 +330,7 @@ export default class AddVenda extends Component<Props, State> {
                                                     onChange={this.onChangeQuantidade}
                                                     InputProps={{
                                                         startAdornment: <InputAdornment position="start">Un</InputAdornment>,
-                                                      }}
+                                                    }}
 
                                                 />
                                             </div>
@@ -291,7 +343,7 @@ export default class AddVenda extends Component<Props, State> {
                                                     onChange={this.onChangeQuantidade}
                                                     InputProps={{
                                                         startAdornment: <InputAdornment position="start">Kg</InputAdornment>,
-                                                      }}
+                                                    }}
 
                                                 />
                                             </div>
@@ -304,7 +356,7 @@ export default class AddVenda extends Component<Props, State> {
                                                     onChange={this.onChangeValorItem}
                                                     InputProps={{
                                                         startAdornment: <InputAdornment position="start">R$</InputAdornment>,
-                                                      }}
+                                                    }}
                                                 />
                                             </div>
                                         )}
@@ -382,16 +434,16 @@ export default class AddVenda extends Component<Props, State> {
                                     {formaPagamento === "Dinheiro" ? (
                                         <div className="col-md-5">
                                             <TextField id="valorPago" label="Valor Pago" variant="outlined"
-                                                    type="number"
-                                                    value={valorPago}
-                                                    onChange={this.onChangeValorPago}
-                                                    InputProps={{
-                                                        startAdornment: <InputAdornment position="start">R$</InputAdornment>,
-                                                      }}
-                                                />
+                                                type="number"
+                                                value={valorPago}
+                                                onChange={this.onChangeValorPago}
+                                                InputProps={{
+                                                    startAdornment: <InputAdornment position="start">R$</InputAdornment>,
+                                                }}
+                                            />
                                         </div>
                                     ) : (
-                                        <div className="col-md-3">
+                                        <div className="col-md-5">
                                             <label>
                                                 <strong>Valor Pago:</strong>
                                             </label><strong>{" R$ "}
@@ -405,13 +457,30 @@ export default class AddVenda extends Component<Props, State> {
                                             {valorTroco.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
                                     </div>
                                 </div>
-                                <button onClick={this.finalizarVenda} className="btn btn-success mt-3">
-                                    Finalizar Compra
-                                </button>
+                                <div className="row mt-3">
+                                    <div className="col-4">
+                                        <TextField id="valorPago" label="Cliente" variant="outlined"
+                                            type="text"
+                                            value={cliente}
+                                            onChange={this.onChangeCliente}
+                                        />
+                                    </div>
+                                    <div className="col-4">
+                                        <button onClick={this.pagamentoPendente} className="btn btn-warning mt-3">
+                                            Pagamento pendente
+                                        </button>
+                                    </div>
+                                    <div className="col-4">
+                                        <button onClick={this.finalizarVenda} className="btn btn-success mt-3">
+                                            Finalizar Compra
+                                        </button>
+                                    </div>
+
+                                </div>
                             </div>
                         ) : (
                             <div className="col-6">
-                                <                           h3>Carrinho de compras</h3>
+                                <h3>Carrinho de compras</h3>
                                 <ul className="list-group">
                                     <li className="list-group-item">
                                         <div className="row">
@@ -427,6 +496,34 @@ export default class AddVenda extends Component<Props, State> {
                                             <div className="col-4">Sem itens adicionados</div>
                                         </div>
                                     </li>
+                                </ul>
+                            </div>
+                        )}
+                        {vendasEmAberto.length > 0 && (
+                                <div className="col-8">
+                                <h4>Pagamentos Pendentes</h4>
+                                <ul className="list-group">
+                                    <li className="list-group-item">
+                                        <div className="row">
+                                            <div className="col-4"><strong>Cliente</strong></div>
+                                            <div className="col-2"><strong>Itens</strong></div>
+                                            <div className="col-3 custom-div-valor"><strong>Valor Total</strong></div>
+                                            <div className="col-2 custom-div-valor"><strong>Valor Pago</strong></div>
+                                        </div>
+                                    </li>
+                                    {vendasEmAberto.map((venda, index) => (
+                                        <li className="list-group-item"
+                                            onClick={() => this.setActiveVenda(venda, index)}
+                                            key={index}>
+                                            <div className="row">
+                                                <div className="col-4">{venda.cliente}</div>
+                                                <div className="col-2">{venda.itens.length.toLocaleString('pt-br', { minimumFractionDigits: 4, maximumFractionDigits: 4 })}</div>
+                                                <div className="col-3 custom-div-valor">R$ {venda.valorTotal.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                                                <div className="col-2 custom-div-valor">R$ {venda.valorPago.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+
+                                            </div>
+                                        </li>
+                                    ))}
                                 </ul>
                             </div>
                         )}
