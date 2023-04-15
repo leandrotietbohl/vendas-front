@@ -39,6 +39,7 @@ export default class AddVenda extends Component<Props, State> {
         this.pagamentoPendente = this.pagamentoPendente.bind(this);
         this.setActiveVenda = this.setActiveVenda.bind(this);
         this.onChangeCliente = this.onChangeCliente.bind(this);
+        this.imprimir = this.imprimir.bind(this);
 
         this.state = {
             itens: [],
@@ -105,7 +106,7 @@ export default class AddVenda extends Component<Props, State> {
 
     adicionarItem() {
         const list = this.state.itens;
-        const cliente = list.length > 0 ? this.state.cliente :  null;
+        const cliente = list.length > 0 ? this.state.cliente : null;
         if (this.state.currentItem) {
             list.push(this.state.currentItem);
         }
@@ -273,6 +274,20 @@ export default class AddVenda extends Component<Props, State> {
         });
     }
 
+    imprimir() {
+        //console.log('print'); 
+        const el: HTMLElement | null = document.getElementById('printablediv');
+
+        if (el) {
+            const definitelyAnElement: HTMLElement = el;
+            let printContents = el.innerHTML;
+            let originalContents = document.body.innerHTML;
+            document.body.innerHTML = printContents;
+            window.print();
+            document.body.innerHTML = originalContents;
+        }
+    }
+
     render() {
         const { produtos, currentItem, itens, valorTotal, formaPagamento, cliente,
             valorPago, valorTroco, produtoID, categorias, open, vendasEmAberto } = this.state;
@@ -295,17 +310,29 @@ export default class AddVenda extends Component<Props, State> {
                                             color="primary"
                                             orientation="vertical"
                                             value={produtoID}
-                                            className="ml-1 custom-botao-tamanho mb-2" 
+                                            className="ml-1 custom-botao-tamanho mb-2"
                                             exclusive
                                             onChange={this.handleChangeProduto}
                                             aria-label="Platform"
                                             key={categoria.id}
                                         >
                                             {produtos &&
-                                                produtos.filter(prod => prod.categoria === categoria.id).map((produto, index) => (
-                                                    <ToggleButton className={"font-pricipal "  + categoria.id}
-                                                        value={produto.uid} key={index}>{produto.nome}</ToggleButton>
-                                                ))}
+                                                produtos.filter(prod => prod.categoria === categoria.id)
+                                                    .sort((n1, n2) => {
+                                                        if (n1.valor > n2.valor) {
+                                                            return 1;
+                                                        }
+
+                                                        if (n1.valor < n2.valor) {
+                                                            return -1;
+                                                        }
+
+                                                        return 0;
+                                                    })
+                                                    .map((produto, index) => (
+                                                        <ToggleButton className={"font-pricipal " + categoria.id}
+                                                            value={produto.uid} key={index}>{produto.nome}</ToggleButton>
+                                                    ))}
                                         </ToggleButtonGroup>
                                     </div>
                                 ))}
@@ -386,7 +413,7 @@ export default class AddVenda extends Component<Props, State> {
                             )}
                         </div>
                         {itens.length > 0 ? (
-                            <div className="col-6">
+                            <div className="col-6" id="printablediv">
                                 <h3>Carrinho de compras</h3>
                                 <ul className="list-group">
                                     <li className="list-group-item">
@@ -502,7 +529,7 @@ export default class AddVenda extends Component<Props, State> {
                             </div>
                         )}
                         {vendasEmAberto.length > 0 && (
-                                <div className="col-8">
+                            <div className="col-8">
                                 <h4>Pagamentos Pendentes</h4>
                                 <ul className="list-group">
                                     <li className="list-group-item">
