@@ -481,7 +481,7 @@ export default class AddVenda extends Component<Props, State> {
                             </div>
                         ) : (
                             <div className="col-6">
-                                <h3>Carrinho de compras</h3>
+                                <h4>Carrinho de compras</h4>
                                 <ul className="list-group">
                                     <li className="list-group-item">
                                         <div className="row">
