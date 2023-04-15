@@ -289,12 +289,12 @@ export default class AddVenda extends Component<Props, State> {
                             <div className="row">
                                 {categorias.map((categoria) => (
                                     <div className="titulo-central col-4" key={categoria.id}>
-                                        <h4 className="titulo-central">{categoria.name}</h4>
+                                        <h4 className={"titulo-central " + categoria.id}>{categoria.name}</h4>
                                         <ToggleButtonGroup
                                             color="primary"
                                             orientation="vertical"
                                             value={produtoID}
-                                            className="ml-1 custom-botao-tamanho mb-2"
+                                            className="ml-1 custom-botao-tamanho mb-2" 
                                             exclusive
                                             onChange={this.handleChangeProduto}
                                             aria-label="Platform"
@@ -302,7 +302,8 @@ export default class AddVenda extends Component<Props, State> {
                                         >
                                             {produtos &&
                                                 produtos.filter(prod => prod.categoria === categoria.id).map((produto, index) => (
-                                                    <ToggleButton className="font-pricipal" value={produto.uid} key={index}>{produto.nome}</ToggleButton>
+                                                    <ToggleButton className={"font-pricipal "  + categoria.id}
+                                                        value={produto.uid} key={index}>{produto.nome}</ToggleButton>
                                                 ))}
                                         </ToggleButtonGroup>
                                     </div>
