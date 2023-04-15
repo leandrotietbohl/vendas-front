@@ -5,7 +5,7 @@ import VendaService from "../../services/venda.service";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import { Dayjs } from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import 'dayjs/locale/en-gb';
 import moment from "moment";
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
@@ -19,6 +19,10 @@ type State = {
   valorSunTotal: number,
   valorSunPago: number,
   valorSunTroco: number,
+  valorPIXTotal: number,
+  valorDinheiroTotal: number,
+  valorDebitoTotal: number,
+  valorCreditoTotal: number,
   currentVenda: VendaDTO | null,
 };
 
@@ -33,11 +37,15 @@ export default class VendaList extends Component<Props, State> {
     this.state = {
       vendas: [],
       currentVenda: null,
-      start: null,
-      end: null,
+      start: dayjs(new Date()).hour(0).minute(0).second(0),
+      end: dayjs(new Date()).hour(23).minute(59).second(59),
       valorSunTotal: 0,
       valorSunPago: 0,
       valorSunTroco: 0,
+      valorPIXTotal: 0,
+      valorDinheiroTotal: 0,
+      valorDebitoTotal: 0,
+      valorCreditoTotal: 0,
     };
   }
 
@@ -57,6 +65,10 @@ export default class VendaList extends Component<Props, State> {
         this.setState({
           vendas: response.data,
           valorSunTotal: response.data.reduce((sum, x) => sum + x.valorTotal, 0),
+          valorPIXTotal: response.data.filter(v => v.formaPagamento === "PIX").reduce((sum, x) => sum + x.valorTotal, 0),
+          valorDinheiroTotal: response.data.filter(v => v.formaPagamento === "Dinheiro").reduce((sum, x) => sum + x.valorTotal, 0),
+          valorDebitoTotal: response.data.filter(v => v.formaPagamento === "Debito").reduce((sum, x) => sum + x.valorTotal, 0),
+          valorCreditoTotal: response.data.filter(v => v.formaPagamento === "Credito").reduce((sum, x) => sum + x.valorTotal, 0),
           valorSunPago: response.data.reduce((sum, x) => sum + x.valorPago, 0),
           valorSunTroco: response.data.reduce((sum, x) => sum + x.valorTroco, 0),
         });
@@ -100,6 +112,10 @@ export default class VendaList extends Component<Props, State> {
       valorSunPago,
       valorSunTroco,
       currentVenda,
+      valorCreditoTotal,
+      valorDebitoTotal,
+      valorDinheiroTotal,
+      valorPIXTotal,
     } = this.state;
 
     return (
@@ -207,11 +223,11 @@ export default class VendaList extends Component<Props, State> {
             </table>
             <label>Forma pagamento: {currentVenda.formaPagamento}</label><br />
             <label>Total: {currentVenda.valorTotal ?
-                      'R$ ' + currentVenda.valorTotal.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '-'}</label><br />
+              'R$ ' + currentVenda.valorTotal.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '-'}</label><br />
             <label>Pago: {currentVenda.valorPago ?
-                      'R$ ' + currentVenda.valorPago.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '-'}</label><br />
+              'R$ ' + currentVenda.valorPago.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '-'}</label><br />
             <label>Troco: {currentVenda.valorTroco ?
-                      'R$ ' + currentVenda.valorTroco.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '-'}</label><br />
+              'R$ ' + currentVenda.valorTroco.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '-'}</label><br />
           </div>
         ) : (
           <div className="col-5">
@@ -236,6 +252,32 @@ export default class VendaList extends Component<Props, State> {
               <strong>Total valor troco:</strong>
             </label><strong>{" R$ "}
               {valorSunTroco.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
+          </div>
+        </div>
+        <div className="row col-12 mt-3">
+          <div className="col-3">
+            <label>
+              <strong>Total PIX:</strong>
+            </label><strong>{" R$ "}
+              {valorPIXTotal.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
+          </div>
+          <div className="col-3">
+            <label>
+              <strong>Total Debito:</strong>
+            </label><strong>{" R$ "}
+              {valorDebitoTotal.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
+          </div>
+          <div className="col-3">
+            <label>
+              <strong>Total Credito:</strong>
+            </label><strong>{" R$ "}
+              {valorCreditoTotal.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
+          </div>
+          <div className="col-3">
+            <label>
+              <strong>Total Dinheiro:</strong>
+            </label><strong>{" R$ "}
+              {valorDinheiroTotal.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
           </div>
         </div>
       </div>
