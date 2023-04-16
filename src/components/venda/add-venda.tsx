@@ -77,7 +77,7 @@ export default class AddVenda extends Component<Props, State> {
                 this.setState({
                     produtos: response.data,
                 });
-                
+
             })
             .catch((e) => {
                 console.log(e);
@@ -95,8 +95,10 @@ export default class AddVenda extends Component<Props, State> {
         });
     }
 
-    onPressEnterItem() {
-        this.adicionarItem();
+    onPressEnterItem(e: any) {
+        if (e.key === 'Enter') {
+            this.adicionarItem();
+        }
     }
 
     onChangeValorItem(e: ChangeEvent<HTMLInputElement>) {
@@ -168,8 +170,10 @@ export default class AddVenda extends Component<Props, State> {
 
     }
 
-    onPressEnterPago() {
-        this.finalizarVenda();
+    onPressEnterPago(e: any) {
+        if (e.key === 'Enter') {
+            this.finalizarVenda();
+        }
     }
 
     finalizarVenda() {
@@ -190,7 +194,7 @@ export default class AddVenda extends Component<Props, State> {
                 this.setState({
                     open: true,
                 });
-                
+
             })
             .catch((e: Error) => {
                 console.log(e);
