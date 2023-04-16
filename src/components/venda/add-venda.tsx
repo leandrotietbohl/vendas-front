@@ -1,4 +1,4 @@
-import { Component, ChangeEvent } from "react";
+import { Component, ChangeEvent, KeyboardEventHandler } from "react";
 import VendaDTO from "../../types/venda.type";
 import ProdutoDTO from "../../types/produto.type";
 import ProdutoService from "../../services/produto.service";
@@ -40,6 +40,8 @@ export default class AddVenda extends Component<Props, State> {
         this.setActiveVenda = this.setActiveVenda.bind(this);
         this.onChangeCliente = this.onChangeCliente.bind(this);
         this.imprimir = this.imprimir.bind(this);
+        this.onPressEnterItem = this.onPressEnterItem.bind(this);
+        this.onPressEnterPago = this.onPressEnterPago.bind(this);
 
         this.state = {
             itens: [],
@@ -91,6 +93,10 @@ export default class AddVenda extends Component<Props, State> {
         this.setState({
             currentItem: item,
         });
+    }
+
+    onPressEnterItem() {
+        this.adicionarItem();
     }
 
     onChangeValorItem(e: ChangeEvent<HTMLInputElement>) {
@@ -160,6 +166,10 @@ export default class AddVenda extends Component<Props, State> {
             cliente: e.target.value,
         });
 
+    }
+
+    onPressEnterPago() {
+        this.finalizarVenda();
     }
 
     finalizarVenda() {
@@ -353,6 +363,7 @@ export default class AddVenda extends Component<Props, State> {
                                                     type="number"
                                                     value={currentItem.quantidade}
                                                     onChange={this.onChangeQuantidade}
+                                                    onKeyPress={this.onPressEnterItem}
                                                     autoFocus
                                                     InputProps={{
                                                         startAdornment: <InputAdornment position="start">Un</InputAdornment>,
@@ -367,6 +378,7 @@ export default class AddVenda extends Component<Props, State> {
                                                     type="number"
                                                     value={currentItem.quantidade}
                                                     onChange={this.onChangeQuantidade}
+                                                    onKeyPress={this.onPressEnterItem}
                                                     autoFocus
                                                     InputProps={{
                                                         startAdornment: <InputAdornment position="start">Kg</InputAdornment>,
@@ -381,6 +393,7 @@ export default class AddVenda extends Component<Props, State> {
                                                     type="number"
                                                     value={currentItem.valorItem}
                                                     onChange={this.onChangeValorItem}
+                                                    onKeyPress={this.onPressEnterItem}
                                                     autoFocus
                                                     InputProps={{
                                                         startAdornment: <InputAdornment position="start">R$</InputAdornment>,
@@ -465,6 +478,7 @@ export default class AddVenda extends Component<Props, State> {
                                                 type="number"
                                                 value={valorPago}
                                                 onChange={this.onChangeValorPago}
+                                                onKeyPress={this.onPressEnterPago}
                                                 autoFocus
                                                 InputProps={{
                                                     startAdornment: <InputAdornment position="start">R$</InputAdornment>,

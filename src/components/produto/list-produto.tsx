@@ -197,7 +197,8 @@ export default class ProdutoList extends Component<Props, State> {
                         key={index}
                         >
                           <div className="row">
-                            <div className="col-8">{produto.nome}</div>
+                            <div className="col-4">{produto.nome}</div>
+                            <div className="col-4">{produto.categoria}</div>
                             <div className="col-4 custom-div-valor">R$ {produto.valor.toLocaleString('pt-br', {minimumFractionDigits: 2})}</div>
                           </div>
                         </li>
