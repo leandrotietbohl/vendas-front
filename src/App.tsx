@@ -34,11 +34,6 @@ class App extends Component {
                 Produtos
               </Link>
             </li>
-            <li className="nav-item">
-              <Link to={"/list_vendas"} className="nav-link">
-                Listar Vendas
-              </Link>
-            </li>
           </div>
         </nav>
 
