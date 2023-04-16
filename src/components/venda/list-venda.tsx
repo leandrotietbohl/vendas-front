@@ -58,7 +58,7 @@ export default class VendaList extends Component<Props, State> {
       start: this.state.start ? moment(this.state.start.toDate()).format('yyyy-MM-DDTHH:mm:ss') : null,
       end: this.state.end ? moment(this.state.end.toDate()).format('yyyy-MM-DDTHH:mm:ss') : null,
     };
-    console.log(data);
+    
     VendaService.filterList(data)
       .then((response) => {
 
@@ -72,7 +72,7 @@ export default class VendaList extends Component<Props, State> {
           valorSunPago: response.data.reduce((sum, x) => sum + x.valorPago, 0),
           valorSunTroco: response.data.reduce((sum, x) => sum + x.valorTroco, 0),
         });
-        console.log(response.data);
+        
       })
       .catch((e) => {
         console.log(e);

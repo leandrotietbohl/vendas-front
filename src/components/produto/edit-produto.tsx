@@ -98,7 +98,7 @@ export default class EditProduto extends Component<Props, State> {
             this.setState({
                 currentProduto: response.data,
             });
-            console.log(response.data);
+            
           })
           .catch((e: Error) => {
             console.log(e);
@@ -106,13 +106,12 @@ export default class EditProduto extends Component<Props, State> {
     }
 
     updateProduto() {
-      console.log(this.state.currentProduto);
         ProdutoService.edit(
           this.state.currentProduto.uid,
           this.state.currentProduto
         )
           .then((response: any) => {
-            console.log(response.data);
+            
             this.setState({
               message: "Sucesso ao alterar o produto!",
             });
@@ -125,7 +124,7 @@ export default class EditProduto extends Component<Props, State> {
     deleteProduto() {
         ProdutoService.delete(this.state.currentProduto.uid)
           .then((response: any) => {
-            console.log(response.data);
+            
             this.voltarLista();
           })
           .catch((e: Error) => {

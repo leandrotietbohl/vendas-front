@@ -75,7 +75,7 @@ export default class AddVenda extends Component<Props, State> {
                 this.setState({
                     produtos: response.data,
                 });
-                console.log(response.data);
+                
             })
             .catch((e) => {
                 console.log(e);
@@ -164,7 +164,6 @@ export default class AddVenda extends Component<Props, State> {
 
     finalizarVenda() {
         const stringDate = moment(new Date()).format('yyyy-MM-DDTHH:mm:ss');
-        console.log(stringDate);
         const data: VendaDTO = {
             itens: this.state.itens,
             valorDesconto: this.state.valorDesconto,
@@ -176,14 +175,12 @@ export default class AddVenda extends Component<Props, State> {
             cliente: this.state.cliente
         };
 
-        console.log(data);
-
         VendaService.create(data)
             .then((response: any) => {
                 this.setState({
                     open: true,
                 });
-                console.log(response.data);
+                
             })
             .catch((e: Error) => {
                 console.log(e);
@@ -275,7 +272,6 @@ export default class AddVenda extends Component<Props, State> {
     }
 
     imprimir() {
-        //console.log('print'); 
         const el: HTMLElement | null = document.getElementById('printablediv');
 
         if (el) {

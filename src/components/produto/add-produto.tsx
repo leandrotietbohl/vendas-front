@@ -77,7 +77,7 @@ export default class AddProduto extends Component<Props, State> {
                 this.setState({
                     submitted: true
                 });
-                console.log(response.data);
+                
             })
             .catch((e: Error) => {
                 console.log(e);

@@ -65,7 +65,7 @@ export default class ProdutoList extends Component<Props, State> {
                 produtos: response.data.content,
                 count: response.data.totalPages,
             });
-            console.log(response.data);
+            
           })
           .catch((e) => {
             console.log(e);
