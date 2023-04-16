@@ -8,6 +8,7 @@ import ProdutoList from "./components/produto/list-produto";
 import EditProduto from "./components/produto/edit-produto";
 import AddVenda from "./components/venda/add-venda";
 import VendaList from "./components/venda/list-venda";
+import AddCaixa from "./components/caixa/add-caixa";
 
 class App extends Component {
   render() {
@@ -18,9 +19,14 @@ class App extends Component {
             Sorveteria Bom Cream
           </Link>
           <div className="navbar-nav mr-auto">
-          <li className="nav-item">
+            <li className="nav-item">
               <Link to={"/add_venda"} className="nav-link">
                 Venda
+              </Link>
+            </li>
+            <li className="nav-item">
+              <Link to={"/add_caixa"} className="nav-link">
+                Caixa
               </Link>
             </li>
             <li className="nav-item">
@@ -30,7 +36,7 @@ class App extends Component {
             </li>
             <li className="nav-item">
               <Link to={"/list_vendas"} className="nav-link">
-                Vendas
+                Listar Vendas
               </Link>
             </li>
           </div>
@@ -39,6 +45,7 @@ class App extends Component {
         <div className="container mt-3 custom-container">
           <Switch>
             <Route exact path={["/", "/add_venda"]} component={AddVenda} />
+            <Route exact path="/add_caixa" component={AddCaixa} />
             <Route exact path="/list_produto" component={ProdutoList} />
             <Route exact path="/list_vendas" component={VendaList} />
             <Route exact path="/add_produto" component={AddProduto} />
