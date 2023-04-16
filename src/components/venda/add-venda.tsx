@@ -86,7 +86,7 @@ export default class AddVenda extends Component<Props, State> {
         const item = this.state.currentItem;
         if (item) {
             item.quantidade = e.target.valueAsNumber;
-            item.valorItem = item.produto.valor * item.quantidade;
+            item.valorItem = new Number((item.produto.valor * item.quantidade).toFixed(2)).valueOf();
         }
         this.setState({
             currentItem: item,
@@ -115,8 +115,8 @@ export default class AddVenda extends Component<Props, State> {
 
         this.setState({
             itens: list,
-            valorTotal: sum,
-            valorPago: sum,
+            valorTotal: new Number(sum.toFixed(2)).valueOf(),
+            valorPago: new Number(sum.toFixed(2)).valueOf(),
             valorTroco: 0,
             cliente: cliente,
             currentItem: null,
