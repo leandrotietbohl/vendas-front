@@ -1,8 +1,11 @@
 import { Component, ChangeEvent } from "react";
+import CaixaDTO from "../../types/caixa.type";
 
 type Props = {};
 
-type State = {};
+type State = CaixaDTO & {
+    
+};
 
 export default class AddCaixa extends Component<Props, State> {
     constructor(props: Props) {
