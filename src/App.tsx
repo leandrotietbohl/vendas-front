@@ -9,6 +9,9 @@ import EditProduto from "./components/produto/edit-produto";
 import AddVenda from "./components/venda/add-venda";
 import VendaList from "./components/venda/list-venda";
 import AddCaixa from "./components/caixa/add-caixa";
+import AddCategoria from "./components/categoria/add-categoria";
+import CategoriaList from "./components/categoria/list-categoria";
+import EditCategoria from "./components/categoria/edit-categoria";
 
 class App extends Component {
   render() {
@@ -34,6 +37,11 @@ class App extends Component {
                 Produtos
               </Link>
             </li>
+            <li className="nav-item">
+              <Link to={"/list_categoria"} className="nav-link">
+                Categoria
+              </Link>
+            </li>
           </div>
         </nav>
 
@@ -41,10 +49,13 @@ class App extends Component {
           <Switch>
             <Route exact path={["/", "/add_venda"]} component={AddVenda} />
             <Route exact path="/add_caixa" component={AddCaixa} />
-            <Route exact path="/list_produto" component={ProdutoList} />
             <Route exact path="/list_vendas" component={VendaList} />
             <Route exact path="/add_produto" component={AddProduto} />
+            <Route exact path="/list_produto" component={ProdutoList} />
             <Route path="/list_produto/:id" component={EditProduto} />
+            <Route exact path="/add_categoria" component={AddCategoria} />
+            <Route exact path="/list_categoria" component={CategoriaList} />
+            <Route path="/list_categoria/:id" component={EditCategoria} />
           </Switch>
         </div>
       </div>
