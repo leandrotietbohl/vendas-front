@@ -1,15 +1,18 @@
-import { Component, ChangeEvent, KeyboardEventHandler } from "react";
+import { Component, ChangeEvent } from "react";
 import VendaDTO from "../../types/venda.type";
 import ProdutoDTO from "../../types/produto.type";
 import ProdutoService from "../../services/produto.service";
 import VendaItemDTO from "../../types/vendaItem.type";
 import DeleteIcon from '@mui/icons-material/Delete';
 import VendaService from "../../services/venda.service";
-import { Select, MenuItem, SelectChangeEvent, Collapse, TextField, InputLabel, FormControl, InputAdornment } from "@mui/material";
+import { Select, MenuItem, SelectChangeEvent, Collapse, TextField, InputLabel, FormControl, InputAdornment, Autocomplete } from "@mui/material";
 import moment from 'moment';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import Alert from '@mui/material/Alert';
+import CategoriaDTO from "../../types/categoria.type";
+import CategoriaService from "../../services/categoria.service";
+import CaixaService from "../../services/caixa.service";
 
 type Props = {};
 
@@ -18,7 +21,8 @@ type State = VendaDTO & {
     vendasEmAberto: Array<VendaDTO>,
     currentItem: VendaItemDTO | null,
     produtoID: string,
-    categorias: Array<any>,
+    produtoNome: string | null,
+    categorias: Array<CategoriaDTO>,
     open: boolean,
 };
 
@@ -42,8 +46,10 @@ export default class AddVenda extends Component<Props, State> {
         this.imprimir = this.imprimir.bind(this);
         this.onPressEnterItem = this.onPressEnterItem.bind(this);
         this.onPressEnterPago = this.onPressEnterPago.bind(this);
+        this.handleChangeProdutoOculto = this.handleChangeProdutoOculto.bind(this);
 
         this.state = {
+            caixa: null,
             itens: [],
             vendasEmAberto: [],
             valorDesconto: 0,
@@ -55,29 +61,48 @@ export default class AddVenda extends Component<Props, State> {
             valorPago: 0,
             valorTroco: 0,
             produtoID: "",
+            produtoNome: null,
             open: false,
-            categorias: [
-                { id: "expresso", name: "Expresso" },
-                { id: "milk", name: "Milkshake" },
-                { id: "artesanal", name: "Artesanal" },
-                { id: "acai", name: "Açaí" },
-                { id: "crepe", name: "Crepe" },
-                { id: "aleatorio", name: "Aleatório" }],
+            categorias: [],
         };
     }
 
     componentDidMount() {
+        this.retrieveCaixa()
+        this.retrieveCategorias()
         this.retrieveProdutos();
+    }
+
+    retrieveCaixa() {
+        CaixaService.get()
+            .then((response) => {
+                this.setState({
+                    caixa: response.data.uid ? response.data.uid : "",
+                });
+            })
+            .catch((e) => {
+                console.log(e);
+            });
+    }
+
+    retrieveCategorias() {
+        CategoriaService.getAll()
+            .then((response) => {
+                this.setState({
+                    categorias: response.data,
+                });
+            })
+            .catch((e) => {
+                console.log(e);
+            });
     }
 
     retrieveProdutos() {
         ProdutoService.getAll()
             .then((response) => {
-
                 this.setState({
                     produtos: response.data,
                 });
-
             })
             .catch((e) => {
                 console.log(e);
@@ -129,6 +154,7 @@ export default class AddVenda extends Component<Props, State> {
             cliente: cliente,
             currentItem: null,
             produtoID: "",
+            produtoNome: null,
         });
     }
 
@@ -179,6 +205,7 @@ export default class AddVenda extends Component<Props, State> {
     finalizarVenda() {
         const stringDate = moment(new Date()).format('yyyy-MM-DDTHH:mm:ss');
         const data: VendaDTO = {
+            caixa: this.state.caixa,
             itens: this.state.itens,
             valorDesconto: this.state.valorDesconto,
             valorTotal: this.state.valorTotal,
@@ -221,6 +248,7 @@ export default class AddVenda extends Component<Props, State> {
 
     pagamentoPendente() {
         const data: VendaDTO = {
+            caixa: this.state.caixa,
             itens: this.state.itens,
             valorDesconto: this.state.valorDesconto,
             valorTotal: this.state.valorTotal,
@@ -248,6 +276,37 @@ export default class AddVenda extends Component<Props, State> {
         })
     }
 
+    handleChangeProdutoOculto(event: any, value: string | null) {
+        if (!value) {
+            this.setState({
+                produtoID: "",
+                produtoNome: value,
+                currentItem: null,
+            });
+            return;
+        }
+        var prod = null;
+        for (let i = 0; i < this.state.produtos.length; i++) {
+            if (this.state.produtos[i].nome === value) {
+                prod = this.state.produtos[i];
+                break;
+            }
+        }
+
+        if (prod) {
+            const item = {
+                produto: prod,
+                quantidade: prod.tipoMedida === "Kilograma" ? 0 : 1,
+                valorItem: prod.tipoMedida === "Kilograma" ? 0 : prod.valor,
+            };
+            this.setState({
+                currentItem: item,
+                produtoID: "",
+                produtoNome: value,
+            });
+        }
+    }
+
     handleChangeProduto(event: React.MouseEvent<HTMLElement>,
         idProduto: string) {
         var prod = null;
@@ -267,6 +326,7 @@ export default class AddVenda extends Component<Props, State> {
             this.setState({
                 currentItem: item,
                 produtoID: idProduto,
+                produtoNome: null,
             });
         }
     }
@@ -282,6 +342,7 @@ export default class AddVenda extends Component<Props, State> {
             valorTroco: 0,
             currentItem: null,
             produtoID: "",
+            produtoNome: null,
         });
     }
 
@@ -299,8 +360,8 @@ export default class AddVenda extends Component<Props, State> {
     }
 
     render() {
-        const { produtos, currentItem, itens, valorTotal, formaPagamento, cliente,
-            valorPago, valorTroco, produtoID, categorias, open, vendasEmAberto } = this.state;
+        const { produtos, currentItem, itens, valorTotal, formaPagamento, cliente, caixa,
+            valorPago, valorTroco, produtoID, produtoNome, categorias, open, vendasEmAberto } = this.state;
 
         return (
             <div>
@@ -310,271 +371,298 @@ export default class AddVenda extends Component<Props, State> {
                             Venda registrada com sucesso!
                         </Alert>
                     </Collapse>
-                    <div className="row">
-                        <div className="col-6">
-                            <div className="row">
-                                {categorias.map((categoria) => (
-                                    <div className="titulo-central col-4" key={categoria.id}>
-                                        <h4 className={"titulo-central " + categoria.id}>{categoria.name}</h4>
-                                        <ToggleButtonGroup
-                                            color="primary"
-                                            orientation="vertical"
-                                            value={produtoID}
-                                            className="ml-1 custom-botao-tamanho mb-2"
-                                            exclusive
-                                            onChange={this.handleChangeProduto}
-                                            aria-label="Platform"
-                                            key={categoria.id}
-                                        >
-                                            {produtos &&
-                                                produtos.filter(prod => prod.categoria === categoria.id)
-                                                    .sort((n1, n2) => {
-                                                        if (n1.valor > n2.valor) {
-                                                            return 1;
-                                                        }
+                    {caixa ? (
+                        <div className="row">
+                            <div className="col-6">
+                                <div className="row">
+                                    {categorias.map((categoria) => {
+                                        if (categoria.tipo === "visivel") {
+                                            return (
+                                                <div className="titulo-central col-4" key={categoria.uid}>
+                                                    <h4 className={"titulo-central " + categoria.uid}>{categoria.nome}</h4>
+                                                    <ToggleButtonGroup
+                                                        color="primary"
+                                                        orientation="vertical"
+                                                        value={produtoID}
+                                                        className="ml-1 custom-botao-tamanho mb-2"
+                                                        exclusive
+                                                        onChange={this.handleChangeProduto}
+                                                        aria-label="Platform"
+                                                        key={categoria.uid}
+                                                    >
+                                                        {produtos &&
+                                                            produtos.filter(prod => prod.categoria === categoria.uid)
+                                                                .sort((n1, n2) => {
+                                                                    if (n1.valor > n2.valor) {
+                                                                        return 1;
+                                                                    }
 
-                                                        if (n1.valor < n2.valor) {
-                                                            return -1;
-                                                        }
+                                                                    if (n1.valor < n2.valor) {
+                                                                        return -1;
+                                                                    }
 
-                                                        return 0;
-                                                    })
-                                                    .map((produto, index) => (
-                                                        <ToggleButton className={"font-pricipal " + categoria.id}
-                                                            value={produto.uid} key={index}>{produto.nome}</ToggleButton>
-                                                    ))}
-                                        </ToggleButtonGroup>
+                                                                    return 0;
+                                                                })
+                                                                .map((produto, index) => (
+                                                                    <ToggleButton className={"font-pricipal " + categoria.uid}
+                                                                        value={produto.uid} key={index}>{produto.nome}</ToggleButton>
+                                                                ))}
+                                                    </ToggleButtonGroup>
+                                                </div>
+                                            )
+                                        } else {
+                                            return (
+                                                <div className="titulo-central col-4" key={categoria.uid}>
+                                                    <h4 className={"titulo-central " + categoria.uid}>{categoria.nome}</h4>
+                                                    <Autocomplete
+                                                        disablePortal
+                                                        id="combo-box-demo"
+                                                        value={produtoNome}
+                                                        onChange={this.handleChangeProdutoOculto}
+                                                        options={produtos.filter(prod => prod.categoria === categoria.uid)
+                                                            .map((produto) => { return produto.nome })}
+                                                        renderInput={(params) => (<TextField {...params} label={categoria.nome} />)}
+                                                    />
+                                                </div>
+                                            )
+                                        }
+                                    }
+                                    )}
+                                </div>
+                                {currentItem ? (
+                                    <div className="row mt-2 ml-3">
+                                        <div className="col-12">
+                                            <h5>Produto: <strong>{currentItem.produto.nome}</strong></h5>
+                                        </div>
+                                        <div className="col-6">
+                                            {!(currentItem.produto.tipoMedida === "Aleatorio") && (
+                                                <div>
+                                                    <label>
+                                                        <strong>Valor:</strong>
+                                                    </label>{" R$ "}
+                                                    {currentItem.produto.valor.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                </div>
+                                            )}
+                                            {currentItem.produto.tipoMedida === "Unidade" && (
+                                                <div>
+                                                    <TextField id="quantidade" label="Quantidade" variant="outlined"
+                                                        type="number"
+                                                        value={currentItem.quantidade}
+                                                        onChange={this.onChangeQuantidade}
+                                                        onKeyPress={this.onPressEnterItem}
+                                                        autoFocus
+                                                        InputProps={{
+                                                            startAdornment: <InputAdornment position="start">Un</InputAdornment>,
+                                                        }}
+
+                                                    />
+                                                </div>
+                                            )}
+                                            {currentItem.produto.tipoMedida === "Kilograma" && (
+                                                <div>
+                                                    <TextField id="quantidade" label="Quantidade" variant="outlined"
+                                                        type="number"
+                                                        value={currentItem.quantidade}
+                                                        onChange={this.onChangeQuantidade}
+                                                        onKeyPress={this.onPressEnterItem}
+                                                        autoFocus
+                                                        InputProps={{
+                                                            startAdornment: <InputAdornment position="start">Kg</InputAdornment>,
+                                                        }}
+
+                                                    />
+                                                </div>
+                                            )}
+                                            {currentItem.produto.tipoMedida === "Aleatorio" && (
+                                                <div>
+                                                    <TextField id="valor" label="Valor" variant="outlined"
+                                                        type="number"
+                                                        value={currentItem.valorItem}
+                                                        onChange={this.onChangeValorItem}
+                                                        onKeyPress={this.onPressEnterItem}
+                                                        autoFocus
+                                                        InputProps={{
+                                                            startAdornment: <InputAdornment position="start">R$</InputAdornment>,
+                                                        }}
+                                                    />
+                                                </div>
+                                            )}
+                                            {!(currentItem.produto.tipoMedida === "Aleatorio") && (
+                                                <div>
+                                                    <label>
+                                                        <strong>Valor do item:</strong>
+                                                    </label><strong>{" R$ "}
+                                                        {currentItem.valorItem.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="col-6">
+                                            <button
+                                                className="btn btn-success mt-3"
+                                                onClick={this.adicionarItem}
+                                            >
+                                                Adicionar Item
+                                            </button>
+                                        </div>
                                     </div>
-                                ))}
+                                ) : (
+                                    <div className="row mt-2">
+                                    </div>
+                                )}
                             </div>
-                            {currentItem ? (
-                                <div className="row mt-2 ml-3">
-                                    <div className="col-12">
-                                        <h5>Produto: <strong>{currentItem.produto.nome}</strong></h5>
+                            {itens.length > 0 ? (
+                                <div className="col-6" id="printablediv">
+                                    <h3 className="titulo-central">Carrinho de compras</h3>
+                                    <ul className="list-group">
+                                        <li className="list-group-item">
+                                            <div className="row">
+                                                <div className="col-4"><strong>Produto</strong></div>
+                                                <div className="col-3 custom-div-valor"><strong>Valor unitario</strong></div>
+                                                <div className="col-2"><strong>Quantidade</strong></div>
+                                                <div className="col-2 custom-div-valor"><strong>Total</strong></div>
+                                                <div className="col-1"></div>
+                                            </div>
+                                        </li>
+                                        {itens.map((item, index) => (
+                                            <li className="list-group-item" key={index}>
+                                                <div className="row">
+                                                    <div className="col-4">{item.produto.nome}</div>
+                                                    <div className="col-3 custom-div-valor">R$ {item.produto.valor.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                                                    <div className="col-2">{item.quantidade.toLocaleString('pt-br', { minimumFractionDigits: 4, maximumFractionDigits: 4 })}</div>
+                                                    <div className="col-2 custom-div-valor">R$ {item.valorItem.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                                                    <div className="col-1"><DeleteIcon onClick={() => this.removeItem(index, item)} /></div>
+                                                </div>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                    <div className="mt-1">
+                                        <label>
+                                            <strong>Valor Total da compra:</strong>
+                                        </label><strong>{" R$ "}
+                                            {valorTotal.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
                                     </div>
-                                    <div className="col-6">
-                                        {!(currentItem.produto.tipoMedida === "Aleatorio") && (
-                                            <div>
-                                                <label>
-                                                    <strong>Valor:</strong>
-                                                </label>{" R$ "}
-                                                {currentItem.produto.valor.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                            </div>
-                                        )}
-                                        {currentItem.produto.tipoMedida === "Unidade" && (
-                                            <div>
-                                                <TextField id="quantidade" label="Quantidade" variant="outlined"
+                                    <div className="row">
+                                        <div className="col-md-4">
+                                            <InputLabel id="formaPagamento-select-label" className="custom-select-label">Forma de pagamento</InputLabel>
+                                            <Select
+                                                labelId="formaPagamento-select-label"
+                                                id="formaPagamento"
+                                                value={formaPagamento}
+                                                fullWidth
+                                                label="Forma de pagamento"
+                                                onChange={this.onChangeFormaPagamento}
+                                            >
+                                                <MenuItem value={"Dinheiro"}> Dinheiro </MenuItem>
+                                                <MenuItem value={"Debito"}> Debito </MenuItem>
+                                                <MenuItem value={"Credito"}> Credito </MenuItem>
+                                                <MenuItem value={"PIX"}> PIX </MenuItem>
+                                            </Select>
+                                        </div>
+                                        {formaPagamento === "Dinheiro" ? (
+                                            <div className="col-md-5">
+                                                <TextField id="valorPago" label="Valor Pago" variant="outlined"
                                                     type="number"
-                                                    value={currentItem.quantidade}
-                                                    onChange={this.onChangeQuantidade}
-                                                    onKeyPress={this.onPressEnterItem}
-                                                    autoFocus
-                                                    InputProps={{
-                                                        startAdornment: <InputAdornment position="start">Un</InputAdornment>,
-                                                    }}
-
-                                                />
-                                            </div>
-                                        )}
-                                        {currentItem.produto.tipoMedida === "Kilograma" && (
-                                            <div>
-                                                <TextField id="quantidade" label="Quantidade" variant="outlined"
-                                                    type="number"
-                                                    value={currentItem.quantidade}
-                                                    onChange={this.onChangeQuantidade}
-                                                    onKeyPress={this.onPressEnterItem}
-                                                    autoFocus
-                                                    InputProps={{
-                                                        startAdornment: <InputAdornment position="start">Kg</InputAdornment>,
-                                                    }}
-
-                                                />
-                                            </div>
-                                        )}
-                                        {currentItem.produto.tipoMedida === "Aleatorio" && (
-                                            <div>
-                                                <TextField id="valor" label="Valor" variant="outlined"
-                                                    type="number"
-                                                    value={currentItem.valorItem}
-                                                    onChange={this.onChangeValorItem}
-                                                    onKeyPress={this.onPressEnterItem}
+                                                    value={valorPago}
+                                                    onChange={this.onChangeValorPago}
+                                                    onKeyPress={this.onPressEnterPago}
                                                     autoFocus
                                                     InputProps={{
                                                         startAdornment: <InputAdornment position="start">R$</InputAdornment>,
                                                     }}
                                                 />
                                             </div>
-                                        )}
-                                        {!(currentItem.produto.tipoMedida === "Aleatorio") && (
-                                            <div>
+                                        ) : (
+                                            <div className="col-md-5">
                                                 <label>
-                                                    <strong>Valor do item:</strong>
+                                                    <strong>Valor Pago:</strong>
                                                 </label><strong>{" R$ "}
-                                                    {currentItem.valorItem.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
+                                                    {valorPago.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
                                             </div>
                                         )}
+                                        <div className="col-md-3">
+                                            <label>
+                                                <strong>Troco:</strong>
+                                            </label><strong>{" R$ "}
+                                                {valorTroco.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
+                                        </div>
                                     </div>
-                                    <div className="col-6">
-                                        <button
-                                            className="btn btn-success mt-3"
-                                            onClick={this.adicionarItem}
-                                        >
-                                            Adicionar Item
-                                        </button>
+                                    <div className="row mt-3">
+                                        <div className="col-4">
+                                            <TextField id="valorPago" label="Cliente" variant="outlined"
+                                                type="text"
+                                                value={cliente}
+                                                onChange={this.onChangeCliente}
+                                            />
+                                        </div>
+                                        <div className="col-4">
+                                            <button onClick={this.pagamentoPendente} className="btn btn-warning mt-3">
+                                                Pagamento pendente
+                                            </button>
+                                        </div>
+                                        <div className="col-4">
+                                            <button onClick={this.finalizarVenda} className="btn btn-success mt-3">
+                                                Finalizar Compra
+                                            </button>
+                                        </div>
+
                                     </div>
                                 </div>
                             ) : (
-                                <div className="row mt-2">
+                                <div className="col-6">
+                                    <h4 className="titulo-central">Carrinho de compras</h4>
+                                    <ul className="list-group">
+                                        <li className="list-group-item">
+                                            <div className="row">
+                                                <div className="col-4"><strong>Produto</strong></div>
+                                                <div className="col-3 custom-div-valor"><strong>Valor unitario</strong></div>
+                                                <div className="col-2"><strong>Quantidade</strong></div>
+                                                <div className="col-2 custom-div-valor"><strong>Total</strong></div>
+                                                <div className="col-1"></div>
+                                            </div>
+                                        </li>
+                                        <li className="list-group-item">
+                                            <div className="row">
+                                                <div className="col-4">Sem itens adicionados</div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            )}
+                            {vendasEmAberto.length > 0 && (
+                                <div className="col-8">
+                                    <h4 className="titulo-central">Pagamentos Pendentes</h4>
+                                    <ul className="list-group">
+                                        <li className="list-group-item">
+                                            <div className="row">
+                                                <div className="col-4"><strong>Cliente</strong></div>
+                                                <div className="col-2"><strong>Itens</strong></div>
+                                                <div className="col-3 custom-div-valor"><strong>Valor Total</strong></div>
+                                                <div className="col-2 custom-div-valor"><strong>Valor Pago</strong></div>
+                                            </div>
+                                        </li>
+                                        {vendasEmAberto.map((venda, index) => (
+                                            <li className="list-group-item"
+                                                onClick={() => this.setActiveVenda(venda, index)}
+                                                key={index}>
+                                                <div className="row">
+                                                    <div className="col-4">{venda.cliente}</div>
+                                                    <div className="col-2">{venda.itens.length.toLocaleString('pt-br', { minimumFractionDigits: 4, maximumFractionDigits: 4 })}</div>
+                                                    <div className="col-3 custom-div-valor">R$ {venda.valorTotal.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                                                    <div className="col-2 custom-div-valor">R$ {venda.valorPago.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+
+                                                </div>
+                                            </li>
+                                        ))}
+                                    </ul>
                                 </div>
                             )}
                         </div>
-                        {itens.length > 0 ? (
-                            <div className="col-6" id="printablediv">
-                                <h3>Carrinho de compras</h3>
-                                <ul className="list-group">
-                                    <li className="list-group-item">
-                                        <div className="row">
-                                            <div className="col-4"><strong>Produto</strong></div>
-                                            <div className="col-3 custom-div-valor"><strong>Valor unitario</strong></div>
-                                            <div className="col-2"><strong>Quantidade</strong></div>
-                                            <div className="col-2 custom-div-valor"><strong>Total</strong></div>
-                                            <div className="col-1"></div>
-                                        </div>
-                                    </li>
-                                    {itens.map((item, index) => (
-                                        <li className="list-group-item" key={index}>
-                                            <div className="row">
-                                                <div className="col-4">{item.produto.nome}</div>
-                                                <div className="col-3 custom-div-valor">R$ {item.produto.valor.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-                                                <div className="col-2">{item.quantidade.toLocaleString('pt-br', { minimumFractionDigits: 4, maximumFractionDigits: 4 })}</div>
-                                                <div className="col-2 custom-div-valor">R$ {item.valorItem.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-                                                <div className="col-1"><DeleteIcon onClick={() => this.removeItem(index, item)} /></div>
-                                            </div>
-                                        </li>
-                                    ))}
-                                </ul>
-                                <div className="mt-1">
-                                    <label>
-                                        <strong>Valor Total da compra:</strong>
-                                    </label><strong>{" R$ "}
-                                        {valorTotal.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
-                                </div>
-                                <div className="row">
-                                    <div className="col-md-4">
-                                        <InputLabel id="formaPagamento-select-label" className="custom-select-label">Forma de pagamento</InputLabel>
-                                        <Select
-                                            labelId="formaPagamento-select-label"
-                                            id="formaPagamento"
-                                            value={formaPagamento}
-                                            fullWidth
-                                            label="Forma de pagamento"
-                                            onChange={this.onChangeFormaPagamento}
-                                        >
-                                            <MenuItem value={"Dinheiro"}> Dinheiro </MenuItem>
-                                            <MenuItem value={"Debito"}> Debito </MenuItem>
-                                            <MenuItem value={"Credito"}> Credito </MenuItem>
-                                            <MenuItem value={"PIX"}> PIX </MenuItem>
-                                        </Select>
-                                    </div>
-                                    {formaPagamento === "Dinheiro" ? (
-                                        <div className="col-md-5">
-                                            <TextField id="valorPago" label="Valor Pago" variant="outlined"
-                                                type="number"
-                                                value={valorPago}
-                                                onChange={this.onChangeValorPago}
-                                                onKeyPress={this.onPressEnterPago}
-                                                autoFocus
-                                                InputProps={{
-                                                    startAdornment: <InputAdornment position="start">R$</InputAdornment>,
-                                                }}
-                                            />
-                                        </div>
-                                    ) : (
-                                        <div className="col-md-5">
-                                            <label>
-                                                <strong>Valor Pago:</strong>
-                                            </label><strong>{" R$ "}
-                                                {valorPago.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
-                                        </div>
-                                    )}
-                                    <div className="col-md-3">
-                                        <label>
-                                            <strong>Troco:</strong>
-                                        </label><strong>{" R$ "}
-                                            {valorTroco.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
-                                    </div>
-                                </div>
-                                <div className="row mt-3">
-                                    <div className="col-4">
-                                        <TextField id="valorPago" label="Cliente" variant="outlined"
-                                            type="text"
-                                            value={cliente}
-                                            onChange={this.onChangeCliente}
-                                        />
-                                    </div>
-                                    <div className="col-4">
-                                        <button onClick={this.pagamentoPendente} className="btn btn-warning mt-3">
-                                            Pagamento pendente
-                                        </button>
-                                    </div>
-                                    <div className="col-4">
-                                        <button onClick={this.finalizarVenda} className="btn btn-success mt-3">
-                                            Finalizar Compra
-                                        </button>
-                                    </div>
+                    ) : (
+                        <div className="row">
+                            Necessário abrir o caixa para efetuar vendas!
+                        </div>
+                    )}
 
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="col-6">
-                                <h4>Carrinho de compras</h4>
-                                <ul className="list-group">
-                                    <li className="list-group-item">
-                                        <div className="row">
-                                            <div className="col-4"><strong>Produto</strong></div>
-                                            <div className="col-3 custom-div-valor"><strong>Valor unitario</strong></div>
-                                            <div className="col-2"><strong>Quantidade</strong></div>
-                                            <div className="col-2 custom-div-valor"><strong>Total</strong></div>
-                                            <div className="col-1"></div>
-                                        </div>
-                                    </li>
-                                    <li className="list-group-item">
-                                        <div className="row">
-                                            <div className="col-4">Sem itens adicionados</div>
-                                        </div>
-                                    </li>
-                                </ul>
-                            </div>
-                        )}
-                        {vendasEmAberto.length > 0 && (
-                            <div className="col-8">
-                                <h4>Pagamentos Pendentes</h4>
-                                <ul className="list-group">
-                                    <li className="list-group-item">
-                                        <div className="row">
-                                            <div className="col-4"><strong>Cliente</strong></div>
-                                            <div className="col-2"><strong>Itens</strong></div>
-                                            <div className="col-3 custom-div-valor"><strong>Valor Total</strong></div>
-                                            <div className="col-2 custom-div-valor"><strong>Valor Pago</strong></div>
-                                        </div>
-                                    </li>
-                                    {vendasEmAberto.map((venda, index) => (
-                                        <li className="list-group-item"
-                                            onClick={() => this.setActiveVenda(venda, index)}
-                                            key={index}>
-                                            <div className="row">
-                                                <div className="col-4">{venda.cliente}</div>
-                                                <div className="col-2">{venda.itens.length.toLocaleString('pt-br', { minimumFractionDigits: 4, maximumFractionDigits: 4 })}</div>
-                                                <div className="col-3 custom-div-valor">R$ {venda.valorTotal.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-                                                <div className="col-2 custom-div-valor">R$ {venda.valorPago.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-
-                                            </div>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        )}
-                    </div>
                 </FormControl>
             </div>
         )

@@ -37,6 +37,7 @@
 
 .titulo-central {
   text-align: center;
+  width: -webkit-fill-available;
 }
 
 .custom-botao-tamanho {
