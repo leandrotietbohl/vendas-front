@@ -626,14 +626,14 @@ export default class AddVenda extends Component<Props, State> {
                                 </div>
                             )}
                             <div className="printme">
-                                <h5 className="titulo-central">Compras: </h5>
+                                <h1 className="titulo-central" style={{fontSize: 'xxx-large', fontWeight: '600'}}>Compras</h1>
                                 <ul className="list-group">
                                     <li className="list-group-item">
                                         <div className="row">
-                                            <div className="col-5"><strong>Produto</strong></div>
+                                            <div className="col-4"><strong>Produto</strong></div>
                                             <div className="col-3 custom-div-valor"><strong>Valor unitario</strong></div>
-                                            <div className="col-2"><strong>Quantidade</strong></div>
-                                            <div className="col-2 custom-div-valor"><strong>Total</strong></div>
+                                            <div className="col-1 custom-div-center"><strong>Quant</strong></div>
+                                            <div className="col-3 custom-div-valor"><strong>Total</strong></div>
                                         </div>
                                     </li>
                                     {itens.map((item, index) => (
@@ -641,8 +641,8 @@ export default class AddVenda extends Component<Props, State> {
                                             <div className="row">
                                                 <div className="col-5">{item.produto.nome}</div>
                                                 <div className="col-3 custom-div-valor">R$ {item.produto.valor.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-                                                <div className="col-2">{item.quantidade.toLocaleString('pt-br', { minimumFractionDigits: 4, maximumFractionDigits: 4 })}</div>
-                                                <div className="col-2 custom-div-valor">R$ {item.valorItem.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                                                <div className="col-1 custom-div-center">{item.quantidade.toLocaleString('pt-br', { minimumFractionDigits: 3, maximumFractionDigits: 3 })}</div>
+                                                <div className="col-3 custom-div-valor">R$ {item.valorItem.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                                             </div>
                                         </li>
                                     ))}
