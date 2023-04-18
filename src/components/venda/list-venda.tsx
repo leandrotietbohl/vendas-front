@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import { Component } from "react";
 import VendaDTO from "../../types/venda.type";
 import FilterVendaDTO from "../../types/venda-filter.type";
 import VendaService from "../../services/venda.service";
@@ -211,16 +211,7 @@ export default class VendaList extends Component<Props, State> {
                 </TableBody>
               </Table>
             </TableContainer>
-            <table>
-              <tr>
-
-              </tr>
-              {currentVenda.itens.map((item) => (
-                <tr>
-
-                </tr>
-              ))}
-            </table>
+            
             <label>Forma pagamento: {currentVenda.formaPagamento}</label><br />
             <label>Total: {currentVenda.valorTotal ?
               'R$ ' + currentVenda.valorTotal.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '-'}</label><br />

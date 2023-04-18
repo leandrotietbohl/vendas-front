@@ -1,4 +1,4 @@
-import { Component, ChangeEvent, KeyboardEventHandler } from "react";
+import { Component, ChangeEvent } from "react";
 import VendaDTO from "../../types/venda.type";
 import ProdutoDTO from "../../types/produto.type";
 import ProdutoService from "../../services/produto.service";
@@ -77,7 +77,7 @@ export default class AddVenda extends Component<Props, State> {
         CaixaService.get()
             .then((response) => {
                 this.setState({
-                    caixa: response.data.uid,
+                    caixa: response.data.uid ? response.data.uid : "",
                 });
             })
             .catch((e) => {
@@ -512,7 +512,7 @@ export default class AddVenda extends Component<Props, State> {
                             </div>
                             {itens.length > 0 ? (
                                 <div className="col-6" id="printablediv">
-                                    <h3>Carrinho de compras</h3>
+                                    <h3 className="titulo-central">Carrinho de compras</h3>
                                     <ul className="list-group">
                                         <li className="list-group-item">
                                             <div className="row">
@@ -609,7 +609,7 @@ export default class AddVenda extends Component<Props, State> {
                                 </div>
                             ) : (
                                 <div className="col-6">
-                                    <h4>Carrinho de compras</h4>
+                                    <h4 className="titulo-central">Carrinho de compras</h4>
                                     <ul className="list-group">
                                         <li className="list-group-item">
                                             <div className="row">
@@ -630,7 +630,7 @@ export default class AddVenda extends Component<Props, State> {
                             )}
                             {vendasEmAberto.length > 0 && (
                                 <div className="col-8">
-                                    <h4>Pagamentos Pendentes</h4>
+                                    <h4 className="titulo-central">Pagamentos Pendentes</h4>
                                     <ul className="list-group">
                                         <li className="list-group-item">
                                             <div className="row">

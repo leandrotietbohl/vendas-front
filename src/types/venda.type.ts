@@ -1,9 +1,9 @@
 import VendaItemDTO from "./vendaItem.type";
 
 export default interface VendaDTO {
-    uid?: any | null,
+    uid?: string | null,
     caixa: string | null,
-    cliente?: any | null,
+    cliente?: string | null,
     itens: Array<VendaItemDTO>,
     valorDesconto: number,
     valorTotal: number,

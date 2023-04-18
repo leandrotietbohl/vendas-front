@@ -1,9 +1,8 @@
-import React, { Component, ChangeEvent } from "react";
+import { Component } from "react";
 import CategoriaService from "../../services/categoria.service";
 import CategoriaDTO from "../../types/categoria.type";
 import { Link } from "react-router-dom";
 import Pagination from '@mui/material/Pagination'
-import { Select, MenuItem, SelectChangeEvent } from "@mui/material";
 
 type Props = {};
 

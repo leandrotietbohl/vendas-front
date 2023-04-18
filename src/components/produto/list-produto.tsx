@@ -1,4 +1,4 @@
-import React, { Component, ChangeEvent } from "react";
+import { Component, ChangeEvent } from "react";
 import ProdutoService from "../../services/produto.service";
 import FilterProdutoDTO from "../../types/produto-filter.type";
 import ProdutoDTO from "../../types/produto.type";
