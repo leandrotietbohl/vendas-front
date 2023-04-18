@@ -626,7 +626,7 @@ export default class AddVenda extends Component<Props, State> {
                                 </div>
                             )}
                             <div className="printme">
-                                <h1 className="titulo-central" style={{fontSize: 'xxx-large', fontWeight: '600'}}>Compras</h1>
+                                <h1 className="titulo-central" style={{ fontSize: 'xxx-large', fontWeight: '600' }}>Compras</h1>
                                 <ul className="list-group">
                                     <li className="list-group-item">
                                         <div className="row">
@@ -652,6 +652,9 @@ export default class AddVenda extends Component<Props, State> {
                                         <strong>Valor Total da compra:</strong>
                                     </label><strong>{" R$ "}
                                         {valorTotal.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
+                                </div>
+                                <div className="mt-1" style={{ textAlign: 'center' }}>
+                                    <label>{new Date().toLocaleString()}</label>
                                 </div>
                             </div>
                             {vendasEmAberto.length > 0 && (

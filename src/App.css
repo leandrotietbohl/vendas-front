@@ -91,6 +91,7 @@
   display: none;
   font-size: 40px;
 }
+
 @media print { 
     .no-printme  { display: none;}
     .printme  { display: block;}
