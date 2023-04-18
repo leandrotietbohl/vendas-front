@@ -13,6 +13,7 @@ import Alert from '@mui/material/Alert';
 import CategoriaDTO from "../../types/categoria.type";
 import CategoriaService from "../../services/categoria.service";
 import CaixaService from "../../services/caixa.service";
+import logo from "../../logo_bomcream.png";
 
 type Props = {};
 
@@ -626,6 +627,7 @@ export default class AddVenda extends Component<Props, State> {
                                 </div>
                             )}
                             <div className="printme">
+                                <img src={logo} alt={"logo"} style={{width: '100%'}}/>
                                 <h1 className="titulo-central" style={{ fontSize: 'xxx-large', fontWeight: '600' }}>Compras</h1>
                                 <ul className="list-group">
                                     <li className="list-group-item">
