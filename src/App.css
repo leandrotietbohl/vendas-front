@@ -81,3 +81,11 @@
   color: deeppink!important;
   font-weight: 600!important;
 }
+
+.printme {
+  width: -webkit-fill-available; 
+  display: none;}
+@media print { 
+    .no-printme  { display: none;}
+    .printme  { display: block;}
+}

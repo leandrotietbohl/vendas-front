@@ -61,6 +61,7 @@ export default class AddVenda extends Component<Props, State> {
             valorPago: 0,
             valorTroco: 0,
             produtoID: "",
+            cliente: "",
             produtoNome: null,
             open: false,
             categorias: [],
@@ -139,7 +140,7 @@ export default class AddVenda extends Component<Props, State> {
 
     adicionarItem() {
         const list = this.state.itens;
-        const cliente = list.length > 0 ? this.state.cliente : null;
+        const cliente = list.length > 0 ? this.state.cliente : "";
         if (this.state.currentItem) {
             list.push(this.state.currentItem);
         }
@@ -347,16 +348,7 @@ export default class AddVenda extends Component<Props, State> {
     }
 
     imprimir() {
-        const el: HTMLElement | null = document.getElementById('printablediv');
-
-        if (el) {
-            const definitelyAnElement: HTMLElement = el;
-            let printContents = el.innerHTML;
-            let originalContents = document.body.innerHTML;
-            document.body.innerHTML = printContents;
-            window.print();
-            document.body.innerHTML = originalContents;
-        }
+        window.print();
     }
 
     render() {
@@ -373,7 +365,7 @@ export default class AddVenda extends Component<Props, State> {
                     </Collapse>
                     {caixa ? (
                         <div className="row">
-                            <div className="col-6">
+                            <div className="col-6 no-printme">
                                 <div className="row">
                                     {categorias.map((categoria) => {
                                         if (categoria.tipo === "visivel") {
@@ -511,7 +503,7 @@ export default class AddVenda extends Component<Props, State> {
                                 )}
                             </div>
                             {itens.length > 0 ? (
-                                <div className="col-6" id="printablediv">
+                                <div className="col-6 no-printme">
                                     <h3 className="titulo-central">Carrinho de compras</h3>
                                     <ul className="list-group">
                                         <li className="list-group-item">
@@ -604,6 +596,11 @@ export default class AddVenda extends Component<Props, State> {
                                                 Finalizar Compra
                                             </button>
                                         </div>
+                                        <div className="col-4">
+                                            <button onClick={this.imprimir} className="btn btn-success mt-3">
+                                                Imprimir
+                                            </button>
+                                        </div>
 
                                     </div>
                                 </div>
@@ -628,6 +625,35 @@ export default class AddVenda extends Component<Props, State> {
                                     </ul>
                                 </div>
                             )}
+                            <div className="printme">
+                                <h5 className="titulo-central">Compras: </h5>
+                                <ul className="list-group">
+                                    <li className="list-group-item">
+                                        <div className="row">
+                                            <div className="col-5"><strong>Produto</strong></div>
+                                            <div className="col-3 custom-div-valor"><strong>Valor unitario</strong></div>
+                                            <div className="col-2"><strong>Quantidade</strong></div>
+                                            <div className="col-2 custom-div-valor"><strong>Total</strong></div>
+                                        </div>
+                                    </li>
+                                    {itens.map((item, index) => (
+                                        <li className="list-group-item" key={index}>
+                                            <div className="row">
+                                                <div className="col-5">{item.produto.nome}</div>
+                                                <div className="col-3 custom-div-valor">R$ {item.produto.valor.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                                                <div className="col-2">{item.quantidade.toLocaleString('pt-br', { minimumFractionDigits: 4, maximumFractionDigits: 4 })}</div>
+                                                <div className="col-2 custom-div-valor">R$ {item.valorItem.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                                            </div>
+                                        </li>
+                                    ))}
+                                </ul>
+                                <div className="mt-1">
+                                    <label>
+                                        <strong>Valor Total da compra:</strong>
+                                    </label><strong>{" R$ "}
+                                        {valorTotal.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
+                                </div>
+                            </div>
                             {vendasEmAberto.length > 0 && (
                                 <div className="col-8">
                                     <h4 className="titulo-central">Pagamentos Pendentes</h4>
