@@ -630,7 +630,7 @@ export default class AddVenda extends Component<Props, State> {
                                 <ul className="list-group">
                                     <li className="list-group-item">
                                         <div className="row">
-                                            <div className="col-4"><strong>Produto</strong></div>
+                                            <div className="col-5"><strong>Produto</strong></div>
                                             <div className="col-3 custom-div-valor"><strong>Valor item</strong></div>
                                             <div className="col-1 custom-div-center"><strong>Quant</strong></div>
                                             <div className="col-3 custom-div-valor"><strong>Total</strong></div>
