@@ -82,9 +82,15 @@
   font-weight: 600!important;
 }
 
+.custom-div-center {
+  text-align: center;
+}
+
 .printme {
   width: -webkit-fill-available; 
-  display: none;}
+  display: block;
+  font-size: 40px;
+}
 @media print { 
     .no-printme  { display: none;}
     .printme  { display: block;}
