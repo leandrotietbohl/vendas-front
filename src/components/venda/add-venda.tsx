@@ -372,7 +372,7 @@ export default class AddVenda extends Component<Props, State> {
                                         if (categoria.tipo === "visivel") {
                                             return (
                                                 <div className="titulo-central col-4" key={categoria.uid}>
-                                                    <h4 className={"titulo-central " + categoria.uid}>{categoria.nome}</h4>
+                                                    <h4 className={"titulo-central custrom-font-buttom"}>{categoria.nome}</h4>
                                                     <ToggleButtonGroup
                                                         color="primary"
                                                         orientation="vertical"
@@ -397,7 +397,7 @@ export default class AddVenda extends Component<Props, State> {
                                                                     return 0;
                                                                 })
                                                                 .map((produto, index) => (
-                                                                    <ToggleButton className={"font-pricipal " + categoria.uid}
+                                                                    <ToggleButton className={"custom-botao-dentro custrom-font-buttom"}
                                                                         value={produto.uid} key={index}>{produto.nome}</ToggleButton>
                                                                 ))}
                                                     </ToggleButtonGroup>

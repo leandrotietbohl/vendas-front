@@ -44,6 +44,21 @@
   width: 200px;
 }
 
+.custom-botao-dentro {
+  font-family: cursive!important;
+  background-color: #ffd3fc!important;
+  border-bottom-left-radius: 10px!important;
+  border-bottom-right-radius: 10px!important;
+  border-top-left-radius: 10px!important;
+  border-top-right-radius: 10px!important;
+  margin-top: 1px!important;
+}
+
+.custom-botao-dentro:hover {
+  text-decoration: none!important;
+  background-color: rgba(0, 0, 0, 0.04)!important;
+}
+
 .custom-select-label {
   margin-left: 15px;
 }
@@ -52,33 +67,8 @@
   vertical-align: bottom;
 }
 
-.expresso {
+.custrom-font-buttom {
   color: blue!important;
-  font-weight: 600!important;
-}
-
-.milk {
-  color: deeppink!important;
-  font-weight: 600!important;
-}
-
-.artesanal {
-  color: blue!important;
-  font-weight: 600!important;
-}
-
-.acai {
-  color: deeppink!important;
-  font-weight: 600!important;
-}
-
-.crepe {
-  color: blue!important;
-  font-weight: 600!important;
-}
-
-.aleatorio {
-  color: deeppink!important;
   font-weight: 600!important;
 }
 
