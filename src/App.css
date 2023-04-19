@@ -7,10 +7,10 @@
 .custom-container {
   padding-left: 0px;
   margin-left: 20px;
-  padding-right: 0px;
+  padding-right: 40px;
   margin-right: 20px;
   font-family: cursive;
-  max-width: fit-content;
+  max-width: max-content;
 }
 
 .font-pricipal {

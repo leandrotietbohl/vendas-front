@@ -12,42 +12,106 @@ import AddCaixa from "./components/caixa/add-caixa";
 import AddCategoria from "./components/categoria/add-categoria";
 import CategoriaList from "./components/categoria/list-categoria";
 import EditCategoria from "./components/categoria/edit-categoria";
+import authService from "./auth/auth.service";
+import Login from "./components/login/login";
 
-class App extends Component {
+type Props = {};
+
+type State = {
+  showAdminBoard: boolean,
+  currentUser: string | null
+}
+
+class App extends Component<Props, State> {
+  constructor(props: Props) {
+    super(props);
+    this.logOut = this.logOut.bind(this);
+
+    this.state = {
+      showAdminBoard: false,
+      currentUser: null,
+    };
+  }
+
+  componentDidMount() {
+    const user = authService.getCurrentUser();
+
+    if (user) {
+      this.setState({
+        currentUser: user,
+        showAdminBoard: user && user === "admin" ? true : false,
+      });
+    }
+
+    document.addEventListener("logout", (e) => this.logOut);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener("logout", this.logOut);
+  }
+
+  logOut() {
+    authService.logout();
+    this.setState({
+      showAdminBoard: false,
+      currentUser: null,
+    });
+  }
+
   render() {
+    const { currentUser, showAdminBoard } = this.state;
     return (
       <div>
         <nav className="navbar navbar-expand navbar-dark bg-dark">
           <Link to={"/"} className="navbar-brand">
             Sorveteria Bom Cream
           </Link>
-          <div className="navbar-nav mr-auto">
+          {currentUser && (
+            <div className="navbar-nav mr-auto">
+              <li className="nav-item">
+                <Link to={"/add_venda"} className="nav-link">
+                  Venda
+                </Link>
+              </li>
+              {showAdminBoard && (
+                <li className="nav-item">
+                  <Link to={"/add_caixa"} className="nav-link">
+                    Caixa
+                  </Link>
+                </li>
+              )}
+              {showAdminBoard && (
+                <li className="nav-item">
+                  <Link to={"/list_vendas"} className="nav-link">
+                    Lista Vendas
+                  </Link>
+                </li>
+              )}
+              <li className="nav-item">
+                <Link to={"/list_produto"} className="nav-link">
+                  Produtos
+                </Link>
+              </li>
+              <li className="nav-item">
+                <Link to={"/list_categoria"} className="nav-link">
+                  Categoria
+                </Link>
+              </li>
+            </div>
+          )}
+          <div className="navbar-nav ml-auto">
             <li className="nav-item">
-              <Link to={"/add_venda"} className="nav-link">
-                Venda
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link to={"/add_caixa"} className="nav-link">
-                Caixa
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link to={"/list_produto"} className="nav-link">
-                Produtos
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link to={"/list_categoria"} className="nav-link">
-                Categoria
-              </Link>
+              <a href="/" className="nav-link" onClick={this.logOut}>
+                LogOut
+              </a>
             </li>
           </div>
         </nav>
 
         <div className="container mt-3 custom-container">
           <Switch>
-            <Route exact path={["/", "/add_venda"]} component={AddVenda} />
+          <Route exact path={["/", "/login"]} component={Login} />
+            <Route exact path="/add_venda" component={AddVenda} />
             <Route exact path="/add_caixa" component={AddCaixa} />
             <Route exact path="/list_vendas" component={VendaList} />
             <Route exact path="/add_produto" component={AddProduto} />
