@@ -13,7 +13,7 @@ import Alert from '@mui/material/Alert';
 import CategoriaDTO from "../../types/categoria.type";
 import CategoriaService from "../../services/categoria.service";
 import CaixaService from "../../services/caixa.service";
-import logo from "../../logo_bomcream.png";
+import logo from "../../logobomcreampretoebranco.png";
 
 type Props = {};
 
