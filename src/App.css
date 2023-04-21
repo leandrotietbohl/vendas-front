@@ -4,6 +4,19 @@
   margin: auto;
 }
 
+.list-group-item {
+  background-color: #ebebff;
+}
+
+.add-item-color {
+  background-color: #ebebff;
+}
+
+.autocomplite-color {
+  background-color: #ffe7fd;
+  color: blue!important;
+}
+
 .custom-container {
   padding-left: 0px;
   margin-left: 20px;
@@ -15,6 +28,7 @@
 
 .font-pricipal {
   font-family: cursive!important;
+  color: blue!important;
 }
 
 .submit-form {
@@ -46,12 +60,15 @@
 
 .custom-botao-dentro {
   font-family: cursive!important;
-  background-color: #ffd3fc!important;
+  background-color: #ffe7fd!important;
   border-bottom-left-radius: 10px!important;
   border-bottom-right-radius: 10px!important;
   border-top-left-radius: 10px!important;
   border-top-right-radius: 10px!important;
   margin-top: 1px!important;
+  box-shadow: -2px 2px 5px 0px rgb(124 152 245);
+  border-top: 2px solid #bf1717!important;
+  border: 2px solid #f6b5ed!important;
 }
 
 .custom-botao-dentro:hover {

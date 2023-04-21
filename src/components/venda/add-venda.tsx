@@ -5,7 +5,7 @@ import ProdutoService from "../../services/produto.service";
 import VendaItemDTO from "../../types/vendaItem.type";
 import DeleteIcon from '@mui/icons-material/Delete';
 import VendaService from "../../services/venda.service";
-import { Select, MenuItem, SelectChangeEvent, Collapse, TextField, InputLabel, FormControl, InputAdornment, Autocomplete } from "@mui/material";
+import { Select, MenuItem, SelectChangeEvent, Collapse, TextField, InputLabel, FormControl, InputAdornment, Autocomplete, Modal } from "@mui/material";
 import moment from 'moment';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
@@ -25,6 +25,7 @@ type State = VendaDTO & {
     produtoNome: string | null,
     categorias: Array<CategoriaDTO>,
     open: boolean,
+    openModel: boolean,
 };
 
 export default class AddVenda extends Component<Props, State> {
@@ -48,6 +49,7 @@ export default class AddVenda extends Component<Props, State> {
         this.onPressEnterItem = this.onPressEnterItem.bind(this);
         this.onPressEnterPago = this.onPressEnterPago.bind(this);
         this.handleChangeProdutoOculto = this.handleChangeProdutoOculto.bind(this);
+        this.handleClose = this.handleClose.bind(this);
 
         this.state = {
             caixa: null,
@@ -65,6 +67,7 @@ export default class AddVenda extends Component<Props, State> {
             cliente: "",
             produtoNome: null,
             open: false,
+            openModel: false,
             categorias: [],
         };
     }
@@ -305,6 +308,7 @@ export default class AddVenda extends Component<Props, State> {
                 currentItem: item,
                 produtoID: "",
                 produtoNome: value,
+                openModel: true,
             });
         }
     }
@@ -329,6 +333,7 @@ export default class AddVenda extends Component<Props, State> {
                 currentItem: item,
                 produtoID: idProduto,
                 produtoNome: null,
+                openModel: true,
             });
         }
     }
@@ -352,8 +357,17 @@ export default class AddVenda extends Component<Props, State> {
         window.print();
     }
 
+    handleClose() {
+        this.setState({
+            openModel: false,
+            produtoID: "",
+            produtoNome: null,
+            currentItem: null,
+        });
+    }
+
     render() {
-        const { produtos, currentItem, itens, valorTotal, formaPagamento, cliente, caixa,
+        const { produtos, currentItem, itens, valorTotal, formaPagamento, cliente, caixa, openModel,
             valorPago, valorTroco, produtoID, produtoNome, categorias, open, vendasEmAberto } = this.state;
 
         return (
@@ -410,6 +424,7 @@ export default class AddVenda extends Component<Props, State> {
                                                     <Autocomplete
                                                         disablePortal
                                                         id="combo-box-demo"
+                                                        className="autocomplite-color"
                                                         value={produtoNome}
                                                         onChange={this.handleChangeProdutoOculto}
                                                         options={produtos.filter(prod => prod.categoria === categoria.uid)
@@ -423,81 +438,92 @@ export default class AddVenda extends Component<Props, State> {
                                     )}
                                 </div>
                                 {currentItem ? (
-                                    <div className="row mt-2 ml-3">
-                                        <div className="col-12">
-                                            <h5>Produto: <strong>{currentItem.produto.nome}</strong></h5>
-                                        </div>
-                                        <div className="col-6">
-                                            {!(currentItem.produto.tipoMedida === "Aleatorio") && (
-                                                <div>
-                                                    <label>
-                                                        <strong>Valor:</strong>
-                                                    </label>{" R$ "}
-                                                    {currentItem.produto.valor.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                                </div>
-                                            )}
-                                            {currentItem.produto.tipoMedida === "Unidade" && (
-                                                <div>
-                                                    <TextField id="quantidade" label="Quantidade" variant="outlined"
-                                                        type="number"
-                                                        value={currentItem.quantidade}
-                                                        onChange={this.onChangeQuantidade}
-                                                        onKeyPress={this.onPressEnterItem}
-                                                        autoFocus
-                                                        InputProps={{
-                                                            startAdornment: <InputAdornment position="start">Un</InputAdornment>,
-                                                        }}
+                                    <Modal
+                                        open={openModel}
+                                        onClose={this.handleClose}
+                                        aria-labelledby="modal-modal-title"
+                                        style={{
+                                            marginTop: '200px',
+                                            marginLeft: '150px',
+                                            marginRight: '74%',
+                                        }}
+                                        aria-describedby="modal-modal-description">
+                                        <div className="row pt-2 pb-2 ml-3 mt-3 add-item-color">
+                                            <div className="col-12">
+                                                <h5>Produto: <strong>{currentItem.produto.nome}</strong></h5>
+                                            </div>
+                                            <div className="col-12">
+                                                {!(currentItem.produto.tipoMedida === "Aleatorio") && (
+                                                    <div>
+                                                        <label>
+                                                            <strong>Valor:</strong>
+                                                        </label>{" R$ "}
+                                                        {currentItem.produto.valor.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                    </div>
+                                                )}
+                                                {currentItem.produto.tipoMedida === "Unidade" && (
+                                                    <div>
+                                                        <TextField id="quantidade" label="Quantidade" variant="outlined"
+                                                            type="number"
+                                                            value={currentItem.quantidade}
+                                                            onChange={this.onChangeQuantidade}
+                                                            onKeyPress={this.onPressEnterItem}
+                                                            autoFocus
+                                                            InputProps={{
+                                                                startAdornment: <InputAdornment position="start">Un</InputAdornment>,
+                                                            }}
 
-                                                    />
-                                                </div>
-                                            )}
-                                            {currentItem.produto.tipoMedida === "Kilograma" && (
-                                                <div>
-                                                    <TextField id="quantidade" label="Quantidade" variant="outlined"
-                                                        type="number"
-                                                        value={currentItem.quantidade}
-                                                        onChange={this.onChangeQuantidade}
-                                                        onKeyPress={this.onPressEnterItem}
-                                                        autoFocus
-                                                        InputProps={{
-                                                            startAdornment: <InputAdornment position="start">Kg</InputAdornment>,
-                                                        }}
+                                                        />
+                                                    </div>
+                                                )}
+                                                {currentItem.produto.tipoMedida === "Kilograma" && (
+                                                    <div>
+                                                        <TextField id="quantidade" label="Quantidade" variant="outlined"
+                                                            type="number"
+                                                            value={currentItem.quantidade}
+                                                            onChange={this.onChangeQuantidade}
+                                                            onKeyPress={this.onPressEnterItem}
+                                                            autoFocus
+                                                            InputProps={{
+                                                                startAdornment: <InputAdornment position="start">Kg</InputAdornment>,
+                                                            }}
 
-                                                    />
-                                                </div>
-                                            )}
-                                            {currentItem.produto.tipoMedida === "Aleatorio" && (
-                                                <div>
-                                                    <TextField id="valor" label="Valor" variant="outlined"
-                                                        type="number"
-                                                        value={currentItem.valorItem}
-                                                        onChange={this.onChangeValorItem}
-                                                        onKeyPress={this.onPressEnterItem}
-                                                        autoFocus
-                                                        InputProps={{
-                                                            startAdornment: <InputAdornment position="start">R$</InputAdornment>,
-                                                        }}
-                                                    />
-                                                </div>
-                                            )}
-                                            {!(currentItem.produto.tipoMedida === "Aleatorio") && (
-                                                <div>
-                                                    <label>
-                                                        <strong>Valor do item:</strong>
-                                                    </label><strong>{" R$ "}
-                                                        {currentItem.valorItem.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
-                                                </div>
-                                            )}
+                                                        />
+                                                    </div>
+                                                )}
+                                                {currentItem.produto.tipoMedida === "Aleatorio" && (
+                                                    <div>
+                                                        <TextField id="valor" label="Valor" variant="outlined"
+                                                            type="number"
+                                                            value={currentItem.valorItem}
+                                                            onChange={this.onChangeValorItem}
+                                                            onKeyPress={this.onPressEnterItem}
+                                                            autoFocus
+                                                            InputProps={{
+                                                                startAdornment: <InputAdornment position="start">R$</InputAdornment>,
+                                                            }}
+                                                        />
+                                                    </div>
+                                                )}
+                                                {!(currentItem.produto.tipoMedida === "Aleatorio") && (
+                                                    <div>
+                                                        <label>
+                                                            <strong>Valor do item:</strong>
+                                                        </label><strong>{" R$ "}
+                                                            {currentItem.valorItem.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="col-12">
+                                                <button
+                                                    className="btn btn-success mt-3"
+                                                    onClick={this.adicionarItem}
+                                                >
+                                                    Adicionar Item
+                                                </button>
+                                            </div>
                                         </div>
-                                        <div className="col-6">
-                                            <button
-                                                className="btn btn-success mt-3"
-                                                onClick={this.adicionarItem}
-                                            >
-                                                Adicionar Item
-                                            </button>
-                                        </div>
-                                    </div>
+                                    </Modal>
                                 ) : (
                                     <div className="row mt-2">
                                     </div>
@@ -534,7 +560,7 @@ export default class AddVenda extends Component<Props, State> {
                                         </label><strong>{" R$ "}
                                             {valorTotal.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
                                     </div>
-                                    <div className="row">
+                                    <div className="row pt-3">
                                         <div className="col-md-4">
                                             <InputLabel id="formaPagamento-select-label" className="custom-select-label">Forma de pagamento</InputLabel>
                                             <Select
@@ -627,7 +653,7 @@ export default class AddVenda extends Component<Props, State> {
                                 </div>
                             )}
                             <div className="printme">
-                                <img src={logo} alt={"logo"} style={{width: '100%'}}/>
+                                <img src={logo} alt={"logo"} style={{ width: '100%' }} />
                                 <h1 className="titulo-central" style={{ fontSize: 'xxx-large', fontWeight: '600' }}>Compras</h1>
                                 <ul className="list-group">
                                     <li className="list-group-item">

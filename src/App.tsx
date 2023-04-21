@@ -108,7 +108,7 @@ class App extends Component<Props, State> {
           </div>
         </nav>
 
-        <div className="container mt-3 custom-container">
+        <div className="container mt-3 custom-container font-pricipal">
           <Switch>
           <Route exact path={["/", "/login"]} component={Login} />
             <Route exact path="/add_venda" component={AddVenda} />
