@@ -1,3 +1,14 @@
+html,body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  background-image: url("logo_bomcream.png");
+  background-repeat: no-repeat;
+  background-size: 200px;
+  background-position: right bottom;
+}
+
 .list {
   text-align: left;
   max-width: 750px;
@@ -15,6 +26,7 @@
 .autocomplite-color {
   background-color: #ffe7fd;
   color: blue!important;
+  margin-left: 28px;
 }
 
 .custom-container {
@@ -66,7 +78,7 @@
   border-top-left-radius: 10px!important;
   border-top-right-radius: 10px!important;
   margin-top: 1px!important;
-  box-shadow: -2px 2px 5px 0px rgb(124 152 245);
+  /* box-shadow: -2px 2px 5px 0px rgb(124 152 245); */
   border-top: 2px solid #bf1717!important;
   border: 2px solid #f6b5ed!important;
 }
