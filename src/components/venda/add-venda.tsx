@@ -25,6 +25,7 @@ type State = VendaDTO & {
     produtoNome: string | null,
     categorias: Array<CategoriaDTO>,
     open: boolean,
+    msg: string,
     openModel: boolean,
 };
 
@@ -67,6 +68,7 @@ export default class AddVenda extends Component<Props, State> {
             cliente: "",
             produtoNome: null,
             open: false,
+            msg: "",
             openModel: false,
             categorias: [],
         };
@@ -209,6 +211,9 @@ export default class AddVenda extends Component<Props, State> {
     }
 
     onChangeValorPago(e: ChangeEvent<HTMLInputElement>) {
+        if (e.target.valueAsNumber <= 0) {
+            return;
+        }
         const valorTotal = this.state.valorTotal;
         this.setState({
             valorPago: e.target.valueAsNumber,
@@ -230,6 +235,14 @@ export default class AddVenda extends Component<Props, State> {
     }
 
     finalizarVenda() {
+        if (!this.state.valorPago || this.state.valorPago <= 0) {
+            this.setState({
+                open: true,
+                msg: "Valor Pago deve ser maior que zero",
+            });
+            return;
+        }
+
         const stringDate = moment(new Date()).format('yyyy-MM-DDTHH:mm:ss');
         const data: VendaDTO = {
             caixa: this.state.caixa,
@@ -247,6 +260,7 @@ export default class AddVenda extends Component<Props, State> {
             .then((response: any) => {
                 this.setState({
                     open: true,
+                    msg: "Venda registrada com sucesso!",
                 });
 
             })
@@ -390,14 +404,15 @@ export default class AddVenda extends Component<Props, State> {
 
     render() {
         const { produtos, currentItem, itens, valorTotal, formaPagamento, cliente, caixa, openModel,
-            valorPago, valorTroco, produtoID, produtoNome, categorias, open, vendasEmAberto } = this.state;
+            valorPago, valorTroco, produtoID, produtoNome, categorias, open, msg, vendasEmAberto } = this.state;
 
         return (
             <div>
                 <FormControl fullWidth>
                     <Collapse in={open} addEndListener={this.finalizaAlert}>
-                        <Alert severity="success" color="success">
-                            Venda registrada com sucesso!
+                        <Alert severity={msg === "Venda registrada com sucesso!" ? "success" : "error"} 
+                                color={msg === "Venda registrada com sucesso!" ? "success" : "error"}>
+                            {msg}
                         </Alert>
                     </Collapse>
                     {caixa ? (
@@ -495,7 +510,7 @@ export default class AddVenda extends Component<Props, State> {
                                                                 startAdornment: <InputAdornment position="start">Un</InputAdornment>,
                                                             }}
                                                             required
-                                                            helperText="Quantidade deve ser maior ou igual a 1."
+                                                            helperText="Quantidade deve ser maior ou igual a 1"
                                                         />
                                                     </div>
                                                 )}
@@ -510,7 +525,7 @@ export default class AddVenda extends Component<Props, State> {
                                                             InputProps={{
                                                                 startAdornment: <InputAdornment position="start">Kg</InputAdornment>,
                                                             }}
-                                                            helperText="Quantidade deve ser maior que zero."
+                                                            helperText="Quantidade deve ser maior que zero"
                                                         />
                                                     </div>
                                                 )}
@@ -525,7 +540,7 @@ export default class AddVenda extends Component<Props, State> {
                                                             InputProps={{
                                                                 startAdornment: <InputAdornment position="start">R$</InputAdornment>,
                                                             }}
-                                                            helperText="Valor deve ser maior que zero."
+                                                            helperText="Valor deve ser maior que zero"
                                                         />
                                                     </div>
                                                 )}
@@ -594,6 +609,7 @@ export default class AddVenda extends Component<Props, State> {
                                                 fullWidth
                                                 label="Forma de pagamento"
                                                 onChange={this.onChangeFormaPagamento}
+                                                required
                                             >
                                                 <MenuItem value={"Dinheiro"}> Dinheiro </MenuItem>
                                                 <MenuItem value={"Debito"}> Debito </MenuItem>
@@ -612,6 +628,8 @@ export default class AddVenda extends Component<Props, State> {
                                                     InputProps={{
                                                         startAdornment: <InputAdornment position="start">R$</InputAdornment>,
                                                     }}
+                                                    required
+                                                    helperText="Valor Pago deve ser maior que zero"
                                                 />
                                             </div>
                                         ) : (
