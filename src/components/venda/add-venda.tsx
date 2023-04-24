@@ -117,6 +117,12 @@ export default class AddVenda extends Component<Props, State> {
     onChangeQuantidade(e: ChangeEvent<HTMLInputElement>) {
         const item = this.state.currentItem;
         if (item) {
+            if (e.target.valueAsNumber <= 0 && item.produto.tipoMedida === "Unidade") {
+                return;
+            }
+            if (e.target.valueAsNumber < 0 && item.produto.tipoMedida === "Kilograma") {
+                return;
+            }
             item.quantidade = e.target.valueAsNumber;
             item.valorItem = new Number((item.produto.valor * item.quantidade).toFixed(2)).valueOf();
         }
@@ -134,6 +140,9 @@ export default class AddVenda extends Component<Props, State> {
     onChangeValorItem(e: ChangeEvent<HTMLInputElement>) {
         const item = this.state.currentItem;
         if (item) {
+            if (e.target.valueAsNumber < 0 && item.produto.tipoMedida === "Aleatorio") {
+                return;
+            }
             item.valorItem = e.target.valueAsNumber;
             item.quantidade = 1;
         }
@@ -143,10 +152,23 @@ export default class AddVenda extends Component<Props, State> {
     }
 
     adicionarItem() {
+        if (this.state.currentItem != null) {
+            if (!this.state.currentItem.quantidade || this.state.currentItem.quantidade <= 0 ||
+                !this.state.currentItem.valorItem || this.state.currentItem.valorItem <= 0) {
+                return;
+            }
+        }
+
         const list = this.state.itens;
         const cliente = list.length > 0 ? this.state.cliente : "";
         if (this.state.currentItem) {
-            list.push(this.state.currentItem);
+            var item = list.find((item) => item.produto.uid === this.state.currentItem?.produto.uid);
+            if (item && item.produto.tipoMedida === "Unidade") {
+                item.quantidade = item.quantidade + this.state.currentItem.quantidade;
+                item.valorItem = new Number((item.produto.valor * item.quantidade).toFixed(2)).valueOf();
+            } else {
+                list.push(this.state.currentItem);
+            }
         }
 
         const sum = list.reduce((sum, x) => sum + x.valorItem, 0);
@@ -472,7 +494,8 @@ export default class AddVenda extends Component<Props, State> {
                                                             InputProps={{
                                                                 startAdornment: <InputAdornment position="start">Un</InputAdornment>,
                                                             }}
-
+                                                            required
+                                                            helperText="Quantidade deve ser maior ou igual a 1."
                                                         />
                                                     </div>
                                                 )}
@@ -487,7 +510,7 @@ export default class AddVenda extends Component<Props, State> {
                                                             InputProps={{
                                                                 startAdornment: <InputAdornment position="start">Kg</InputAdornment>,
                                                             }}
-
+                                                            helperText="Quantidade deve ser maior que zero."
                                                         />
                                                     </div>
                                                 )}
@@ -502,6 +525,7 @@ export default class AddVenda extends Component<Props, State> {
                                                             InputProps={{
                                                                 startAdornment: <InputAdornment position="start">R$</InputAdornment>,
                                                             }}
+                                                            helperText="Valor deve ser maior que zero."
                                                         />
                                                     </div>
                                                 )}
