@@ -1,4 +1,4 @@
-import { Component } from "react";
+import { ChangeEvent, Component } from "react";
 import VendaDTO from "../../types/venda.type";
 import FilterVendaDTO from "../../types/venda-filter.type";
 import VendaService from "../../services/venda.service";
@@ -8,7 +8,7 @@ import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import dayjs, { Dayjs } from 'dayjs';
 import 'dayjs/locale/en-gb';
 import moment from "moment";
-import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
+import { InputAdornment, InputLabel, MenuItem, Paper, Select, SelectChangeEvent, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from "@mui/material";
 
 type Props = {};
 
@@ -33,6 +33,10 @@ export default class VendaList extends Component<Props, State> {
     this.refreshList = this.refreshList.bind(this);
     this.onChangeStart = this.onChangeStart.bind(this);
     this.setActiveVenda = this.setActiveVenda.bind(this);
+    this.deleteVenda = this.deleteVenda.bind(this);
+    this.updateVenda = this.updateVenda.bind(this);
+    this.onChangeFormaPagamento = this.onChangeFormaPagamento.bind(this);
+    this.onChangeValorPago = this.onChangeValorPago.bind(this);
 
     this.state = {
       vendas: [],
@@ -58,7 +62,7 @@ export default class VendaList extends Component<Props, State> {
       start: this.state.start ? moment(this.state.start.toDate()).format('yyyy-MM-DDTHH:mm:ss') : null,
       end: this.state.end ? moment(this.state.end.toDate()).format('yyyy-MM-DDTHH:mm:ss') : null,
     };
-    
+
     VendaService.filterList(data)
       .then((response) => {
 
@@ -72,7 +76,7 @@ export default class VendaList extends Component<Props, State> {
           valorSunPago: response.data.reduce((sum, x) => sum + x.valorPago, 0),
           valorSunTroco: response.data.reduce((sum, x) => sum + x.valorTroco, 0),
         });
-        
+
       })
       .catch((e) => {
         console.log(e);
@@ -81,6 +85,38 @@ export default class VendaList extends Component<Props, State> {
 
   refreshList() {
     this.retrieveVendas();
+  }
+
+  deleteVenda() {
+    if (this.state.currentVenda && this.state.currentVenda.uid) {
+      VendaService.delete(this.state.currentVenda.uid)
+        .then((response: any) => {
+          this.setState({
+            currentVenda: null,
+          });
+          this.refreshList();
+        })
+        .catch((e: Error) => {
+          console.log(e);
+        });
+    }
+  }
+
+  updateVenda() {
+    if (this.state.currentVenda && this.state.currentVenda.uid) {
+      VendaService.edit(
+        this.state.currentVenda.uid,
+        this.state.currentVenda
+      )
+        .then((response: any) => {
+          this.setState({
+            currentVenda: null,
+          });
+        })
+        .catch((e: Error) => {
+          console.log(e);
+        });
+    }
   }
 
   onChangeStart(value: Dayjs | null) {
@@ -95,6 +131,34 @@ export default class VendaList extends Component<Props, State> {
       end: value,
     });
     this.refreshList();
+  }
+
+  onChangeFormaPagamento(event: SelectChangeEvent<string>) {
+    const tipo = event.target.value as string;
+    var venda = this.state.currentVenda;
+    if (venda) {
+      venda.formaPagamento = tipo;
+      this.setState({
+        currentVenda: venda
+      });
+    }
+  }
+
+  onChangeValorPago(e: ChangeEvent<HTMLInputElement>) {
+    if (e.target.valueAsNumber <= 0) {
+      return;
+    }
+
+    var venda = this.state.currentVenda;
+    if (venda) {
+      venda.valorPago = e.target.valueAsNumber;
+      venda.valorTroco = e.target.valueAsNumber - venda.valorTotal;
+
+      this.setState({
+        currentVenda: venda,
+      });
+    }
+
   }
 
   setActiveVenda(venda: VendaDTO) {
@@ -211,14 +275,54 @@ export default class VendaList extends Component<Props, State> {
                 </TableBody>
               </Table>
             </TableContainer>
-            
-            <label>Forma pagamento: {currentVenda.formaPagamento}</label><br />
+
+            <InputLabel id="formaPagamento-select-label" className="custom-select-label">Forma de pagamento</InputLabel>
+            <Select
+              labelId="formaPagamento-select-label"
+              id="formaPagamento"
+              value={currentVenda.formaPagamento}
+              fullWidth
+              label="Forma de pagamento"
+              onChange={this.onChangeFormaPagamento}
+            >
+              <MenuItem value={"Dinheiro"}> Dinheiro </MenuItem>
+              <MenuItem value={"Debito"}> Debito </MenuItem>
+              <MenuItem value={"Credito"}> Credito </MenuItem>
+              <MenuItem value={"PIX"}> PIX </MenuItem>
+            </Select>
+            <br />
+
             <label>Total: {currentVenda.valorTotal ?
               'R$ ' + currentVenda.valorTotal.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '-'}</label><br />
-            <label>Pago: {currentVenda.valorPago ?
-              'R$ ' + currentVenda.valorPago.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '-'}</label><br />
+
+            <TextField id="valorPago" label="Valor Pago" variant="outlined"
+              type="number"
+              value={currentVenda.valorPago}
+              onChange={this.onChangeValorPago}
+              autoFocus
+              InputProps={{
+                startAdornment: <InputAdornment position="start">R$</InputAdornment>,
+              }}
+              required
+              helperText="Valor Pago deve ser maior que zero"
+            /><br />
             <label>Troco: {currentVenda.valorTroco ?
               'R$ ' + currentVenda.valorTroco.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '-'}</label><br />
+
+            <button
+              className="badge badge-danger mr-2"
+              onClick={this.deleteVenda}
+            >
+              Remover
+            </button>
+
+            <button
+              type="submit"
+              className="btn btn-success"
+              onClick={this.updateVenda}
+            >
+              Atualizar
+            </button>
           </div>
         ) : (
           <div className="col-5">

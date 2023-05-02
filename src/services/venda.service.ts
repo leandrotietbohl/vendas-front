@@ -17,6 +17,14 @@ class VendaService {
     return http.post<Array<VendaDTO>>("/vendas/filter_all", data);
   }
 
+  delete(id: string) {
+    return http.delete<any>(`/vendas/${id}`);
+  }
+
+  edit(id: string, data: VendaDTO) {
+    return http.put<VendaDTO>(`/vendas/${id}`, data);
+  }
+
 }
 
 export default new VendaService();
