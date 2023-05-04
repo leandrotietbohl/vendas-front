@@ -78,6 +78,12 @@ export default class AddVenda extends Component<Props, State> {
         this.retrieveCaixa()
         this.retrieveCategorias()
         this.retrieveProdutos();
+        let pendentes = localStorage.getItem("pendentes");
+        if (pendentes) {
+            this.setState({
+                vendasEmAberto: JSON.parse(pendentes),
+            });
+        }
     }
 
     retrieveCaixa() {
@@ -274,6 +280,24 @@ export default class AddVenda extends Component<Props, State> {
         const list = this.state.vendasEmAberto;
         list.splice(index, 1);
 
+        if (this.state.itens && this.state.itens.length > 0) {
+            const data: VendaDTO = {
+                caixa: this.state.caixa,
+                itens: this.state.itens,
+                valorDesconto: this.state.valorDesconto,
+                valorTotal: this.state.valorTotal,
+                create: "",
+                formaPagamento: this.state.formaPagamento,
+                valorPago: this.state.valorPago,
+                valorTroco: this.state.valorTroco,
+                cliente: this.state.cliente,
+            };
+            list.push(data);
+        }
+
+        let obj = JSON.stringify(list);
+        localStorage.setItem("pendentes", obj);
+
         this.setState({
             vendasEmAberto: list,
             formaPagamento: venda.formaPagamento,
@@ -303,6 +327,9 @@ export default class AddVenda extends Component<Props, State> {
         const list = this.state.vendasEmAberto;
 
         list.push(data);
+
+        let obj = JSON.stringify(list);
+        localStorage.setItem("pendentes", obj);
 
         this.setState({
             vendasEmAberto: list,
@@ -410,8 +437,8 @@ export default class AddVenda extends Component<Props, State> {
             <div>
                 <FormControl fullWidth>
                     <Collapse in={open} addEndListener={this.finalizaAlert}>
-                        <Alert severity={msg === "Venda registrada com sucesso!" ? "success" : "error"} 
-                                color={msg === "Venda registrada com sucesso!" ? "success" : "error"}>
+                        <Alert severity={msg === "Venda registrada com sucesso!" ? "success" : "error"}
+                            color={msg === "Venda registrada com sucesso!" ? "success" : "error"}>
                             {msg}
                         </Alert>
                     </Collapse>
