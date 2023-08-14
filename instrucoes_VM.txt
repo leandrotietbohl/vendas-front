@@ -1,0 +1,23 @@
+install git
+
+backend:
+install jdk
+install maven
+mkdir backend
+git clone https://github.com/leandrotietbohl/vendas.git
+ajustar conexão banco mongodb: /src/main/resources/application.properties
+mvn clean install
+
+frontend
+install node
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt update -y
+sudo apt install nodejs -y
+mkdir frontend
+git clone https://github.com/leandrotietbohl/vendas-front.git
+export NODE_OPTIONS=--openssl-legacy-provider
+npm run build
+npm install -g serve
+
+cd /home/leandrotietbohl/frontend/vendas-front
+serve -s build & java -jar /home/leandrotietbohl/backend/vendas/target/vendas-0.0.1-SNAPSHOT.jar &
