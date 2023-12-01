@@ -12,6 +12,10 @@ import AddCaixa from "./components/caixa/add-caixa";
 import AddCategoria from "./components/categoria/add-categoria";
 import CategoriaList from "./components/categoria/list-categoria";
 import EditCategoria from "./components/categoria/edit-categoria";
+import AddFuncionario from "./components/funcionario/add-funcionario";
+import FuncionarioList from "./components/funcionario/list-funcionario";
+import EditFuncionario from "./components/funcionario/edit-funcionario";
+
 import authService from "./auth/auth.service";
 import Login from "./components/login/login";
 
@@ -97,6 +101,13 @@ class App extends Component<Props, State> {
                   Categoria
                 </Link>
               </li>
+              {showAdminBoard && (
+                <li className="nav-item">
+                  <Link to={"/list_funcionario"} className="nav-link">
+                    Funcionario
+                  </Link>
+                </li>
+              )}
             </div>
           )}
           <div className="navbar-nav ml-auto">
@@ -120,6 +131,9 @@ class App extends Component<Props, State> {
             <Route exact path="/add_categoria" component={AddCategoria} />
             <Route exact path="/list_categoria" component={CategoriaList} />
             <Route path="/list_categoria/:id" component={EditCategoria} />
+            <Route exact path="/add_funcionario" component={AddFuncionario} />
+            <Route exact path="/list_funcionario" component={FuncionarioList} />
+            <Route path="/list_funcionario/:id" component={EditFuncionario} />
           </Switch>
         </div>
       </div>
