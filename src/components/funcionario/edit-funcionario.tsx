@@ -1,6 +1,6 @@
 import { Component, ChangeEvent } from "react";
 import { RouteComponentProps } from 'react-router-dom';
-import { Select, MenuItem, SelectChangeEvent, Tabs, Tab } from "@mui/material";
+import { Select, MenuItem, SelectChangeEvent, Tabs, Tab, TextField, InputAdornment } from "@mui/material";
 
 import FuncionarioService from "../../services/funcionario.service";
 import FuncionarioDTO from "../../types/funcionario.type";
@@ -36,6 +36,10 @@ export default class EditFuncionario extends Component<Props, State> {
     this.voltarLista = this.voltarLista.bind(this);
     this.onChangeHoraInicio1 = this.onChangeHoraInicio1.bind(this);
     this.onChangeHoraFim1 = this.onChangeHoraFim1.bind(this);
+    this.onChangeHoraInicio2 = this.onChangeHoraInicio2.bind(this);
+    this.onChangeHoraFim2 = this.onChangeHoraFim2.bind(this);
+    this.onChangeValorVale = this.onChangeValorVale.bind(this);
+    this.calculaValorHora = this.calculaValorHora.bind(this);
 
     this.state = {
       currentFuncionario: {
@@ -90,43 +94,78 @@ export default class EditFuncionario extends Component<Props, State> {
     });
   }
 
-  onChangeHoraInicio1(e: ChangeEvent<HTMLInputElement>, mes: number, dia: number) {
+  onChangeHoraInicio1(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, mes: number, dia: number) {
     const tmp = this.state.anoMes;
-        for (let i = 0; i < tmp.meses.length; i++) {
-          if (tmp.meses[i].numero === mes) {
-            for (let j = 0; j < tmp.meses[i].dias.length; i++) {
-              if (tmp.meses[i].dias[j].dia === dia) {
-                tmp.meses[i].dias[j].horaInicio1 = e.target.value;
-                tmp.meses[i].dias[j].valorPeriodo1 = 1;
-                break;
-              }
-            }
-          }
-        }
-
+    tmp.meses[mes-1].dias[dia-1].horaInicio1 = e.target.value;
+    this.calculaValorHora(tmp, mes, dia);
     this.setState({
       anoMes: tmp,
     });
   }
 
-  onChangeHoraFim1(e: ChangeEvent<HTMLInputElement>, mes: number, dia: number) {
+  onChangeHoraFim1(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, mes: number, dia: number) {
     const tmp = this.state.anoMes;
-        for (let i = 0; i < tmp.meses.length; i++) {
-          if (tmp.meses[i].numero === mes) {
-            for (let j = 0; j < tmp.meses[i].dias.length; i++) {
-              if (tmp.meses[i].dias[j].dia === dia) {
-                tmp.meses[i].dias[j].horaFim1 = e.target.value;
-                tmp.meses[i].dias[j].valorPeriodo1 = 2;
-                console.log(tmp.meses[i].dias[j]);
-                break;
-              }
-            }
-          }
-        }
-
+    tmp.meses[mes-1].dias[dia-1].horaFim1 = e.target.value;
+    this.calculaValorHora(tmp, mes, dia);
     this.setState({
       anoMes: tmp,
     });
+  }
+
+  onChangeHoraInicio2(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, mes: number, dia: number) {
+    const tmp = this.state.anoMes;
+    tmp.meses[mes-1].dias[dia-1].horaInicio2 = e.target.value;
+    this.calculaValorHora(tmp, mes, dia);
+    this.setState({
+      anoMes: tmp,
+    });
+  }
+
+  onChangeHoraFim2(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, mes: number, dia: number) {
+    const tmp = this.state.anoMes;
+    tmp.meses[mes-1].dias[dia-1].horaFim2 = e.target.value;
+    this.calculaValorHora(tmp, mes, dia);
+    this.setState({
+      anoMes: tmp,
+    });
+  }
+
+  onChangeValorVale(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, mes: number, dia: number) {
+    const tmp = this.state.anoMes;
+    tmp.meses[mes-1].dias[dia-1].valorVale = +e.target.value;
+    this.calculaValorHora(tmp, mes, dia);
+    this.setState({
+      anoMes: tmp,
+    });
+  }
+
+  calculaValorHora(tmp: AnoTrabalhoDTO, mes: number, dia: number) {
+    var valor = this.state.currentFuncionario.valorHora;
+    var h1 = tmp.meses[mes-1].dias[dia-1].horaInicio1;
+    var h2 = tmp.meses[mes-1].dias[dia-1].horaFim1;
+    var h3 = tmp.meses[mes-1].dias[dia-1].horaInicio2;
+    var h4 = tmp.meses[mes-1].dias[dia-1].horaFim2;
+    var vale = tmp.meses[mes-1].dias[dia-1].valorVale;
+    var totalTrabalho: number = 0;
+    if (h1 != null && h1.length > 4 && h2 != null && h2.length > 4) {
+      var hm1 = h1.split(":");
+      var hm2 = h2.split(":");
+      var mt =(+hm2[0])*60+(+hm2[1])-(+hm1[0])*60+(+hm1[1]);
+      totalTrabalho = mt*valor/60;
+    } 
+    if (h3 != null && h3.length > 4 && h4 != null && h4.length > 4) {
+      var hm1 = h3.split(":");
+      var hm2 = h4.split(":");
+      var mt =(+hm2[0])*60+(+hm2[1])-(+hm1[0])*60+(+hm1[1]);
+      totalTrabalho = totalTrabalho + mt*valor/60;
+    }
+    var totalDia: number = totalTrabalho;
+    if (vale != null && vale > 0) {
+      totalDia = totalDia - vale;
+    }
+    tmp.meses[mes-1].dias[dia-1].valorTrabalho = totalTrabalho;
+    tmp.meses[mes-1].dias[dia-1].valorTotalDia = totalDia;
+    tmp.meses[mes-1].valorMes = tmp.meses[mes-1].dias.map(d => d.valorTotalDia).reduce((prev, next) => prev + next);
   }
 
 
@@ -153,7 +192,7 @@ export default class EditFuncionario extends Component<Props, State> {
   }
 
   updateFuncionario() {
-    /*FuncionarioService.edit(
+    FuncionarioService.edit(
       this.state.currentFuncionario.cpf,
       this.state.currentFuncionario
     )
@@ -165,7 +204,7 @@ export default class EditFuncionario extends Component<Props, State> {
       })
       .catch((e: Error) => {
         console.log(e);
-      });*/
+      });
   }
 
   deleteFuncionario() {
@@ -246,51 +285,89 @@ export default class EditFuncionario extends Component<Props, State> {
                             ))}
                     </Tabs>
                   </div>
-                  <div className="row">
                     {anoMes.meses.map((mes) => (
-                        <TabPanel value={mes.numero.toString()} >
+                        <TabPanel value={mes.numero.toString()} style={{width: "1300px"}}>
+                          <div className="row mt-2">
+                            <div className="col-1" style={{display: "contents"}}></div>
+                            <div className="col-1"></div>
+                            <div className="col-1"></div>
+                            <div className="col-1"></div>
+                            <div className="col-1"></div>
+                            <div className="col-3"></div>
+                            <div className="col-2">Valor Trabalhado</div>
+                            <div className="col-2">Valor dia</div>
+                          </div>
                           {mes.dias.map((dia) => (
-                            <div className="row">
-                              <div className="col-1">
-                                {dia.dia}
-                              </div>
-                              <div className="col-2">
-                                <input type="time" name="incio" value={dia.horaInicio1} onChange={(e) => {this.onChangeHoraInicio1(e, mes.numero, dia.dia)}}/>
-                              </div>
-                              <div className="col-2">
-                                <input type="time" name="fim" value={dia.horaFim1} onChange={(e) => {this.onChangeHoraFim1(e, mes.numero, dia.dia)}}/>
+                            <div className="row mt-2">
+                              <div className="col-1" style={{display: "contents"}}>
+                                <p style={{marginTop: "15px"}}>{dia.dia}</p>
                               </div>
                               <div className="col-1">
-                                <input
-                                  type="number"
-                                  className="form-control"
-                                  id="description"
-                                  value={dia.valorPeriodo1}
-                                />
+                                <TextField id="inicio1" label="Inicio" variant="outlined"
+                                                            type="time"
+                                                            value={dia.horaInicio1}
+                                                            onChange={(e) => {this.onChangeHoraInicio1(e, mes.numero, dia.dia)}}
+                                                        />
                               </div>
                               <div className="col-1">
-                                -
-                              </div>
-                              <div className="col-2">
-                                <input type="time" name="incio2" value={dia.horaInicio2}/>
-                              </div>
-                              <div className="col-2">
-                                <input type="time" name="fim2" value={dia.horaFim2}/>
+                                <TextField id="fim1" label="Fim" variant="outlined"
+                                                            type="time"
+                                                            value={dia.horaFim1}
+                                                            onChange={(e) => {this.onChangeHoraFim1(e, mes.numero, dia.dia)}}
+                                                        />
                               </div>
                               <div className="col-1">
-                              <input
-                                  type="number"
-                                  className="form-control"
-                                  id="description"
-                                  value={dia.valorPeriodo2}
-                                />
+                                <TextField id="incio2" label="Inicio" variant="outlined"
+                                                            type="time"
+                                                            value={dia.horaInicio2}
+                                                            onChange={(e) => {this.onChangeHoraInicio2(e, mes.numero, dia.dia)}}
+                                                        />
+                              </div>
+                              <div className="col-1">
+                                <TextField id="fim2" label="Fim" variant="outlined"
+                                                            type="time"
+                                                            value={dia.horaFim2}
+                                                            onChange={(e) => {this.onChangeHoraFim2(e, mes.numero, dia.dia)}}
+                                                        />
+                              </div>
+                              <div className="col-3">
+                                <TextField id="valorVale" label="Valor Vale" variant="outlined"
+                                                            type="number"
+                                                            value={dia.valorVale}
+                                                            onChange={(e) => {this.onChangeValorVale(e, mes.numero, dia.dia)}}
+                                                            InputProps={{
+                                                                startAdornment: <InputAdornment position="start">R$</InputAdornment>,
+                                                            }}
+                                                        />
+                              </div>
+                              <div className="col-2">
+                                <p style={{marginTop: "15px"}}>R$ {dia.valorTrabalho.toLocaleString('pt-br', 
+                                  { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                              </div>
+                              <div className="col-2">
+                                {dia.valorTotalDia < 0 ? (
+                                  <p style={{marginTop: "15px", color: "red"}}>R$ {dia.valorTotalDia.toLocaleString('pt-br', 
+                                    { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                                ) : (
+                                  <p style={{marginTop: "15px"}}>R$ {dia.valorTotalDia.toLocaleString('pt-br', 
+                                    { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                                )}
                               </div>
                             </div>
                           ))}
+                          <div className="row">
+                            {mes.valorMes< 0 ? (
+                              <p style={{marginTop: "15px", color: "red"}}>Valor total no mes: R$ {mes.valorMes.toLocaleString('pt-br', 
+                              { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                            ) : (
+                              <p style={{marginTop: "15px"}}>Valor total no mes: R$ {mes.valorMes.toLocaleString('pt-br', 
+                              { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                            )}
+                          </div>
                         </TabPanel>
                     ))}
-                  </div>
                 </TabContext>
+               
             </form>
             <div className="row">
               <button

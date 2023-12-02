@@ -4,4 +4,5 @@ export default interface MesTrabalhoDTO {
     numero: number,
     mes: string,
     dias: Array<DiaTrabalhoDTO>,
+    valorMes: number,
   }

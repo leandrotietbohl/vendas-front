@@ -15,9 +15,10 @@ class FuncionarioService {
     return http.get<Array<FuncionarioDTO>>("/funcionario/all");
   }
 
-  /*edit(id: string, data: FuncionarioDTO) {
+  edit(id: string, data: FuncionarioDTO) {
     return http.put<FuncionarioDTO>(`/funcionario/${id}`, data);
-  }*/
+  }
+  
   delete(id: string) {
     return http.delete<any>(`/funcionario/${id}`);
   }
