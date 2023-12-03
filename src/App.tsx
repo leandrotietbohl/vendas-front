@@ -23,6 +23,7 @@ type Props = {};
 
 type State = {
   showAdminBoard: boolean,
+  showCaixaBoard: boolean,
   currentUser: string | null
 }
 
@@ -33,6 +34,7 @@ class App extends Component<Props, State> {
 
     this.state = {
       showAdminBoard: false,
+      showCaixaBoard: false,
       currentUser: null,
     };
   }
@@ -44,6 +46,7 @@ class App extends Component<Props, State> {
       this.setState({
         currentUser: user,
         showAdminBoard: user && user === "admin" ? true : false,
+        showCaixaBoard: user && user === "caixa" ? true : false,
       });
     }
 
@@ -58,12 +61,13 @@ class App extends Component<Props, State> {
     authService.logout();
     this.setState({
       showAdminBoard: false,
+      showCaixaBoard: false,
       currentUser: null,
     });
   }
 
   render() {
-    const { currentUser, showAdminBoard } = this.state;
+    const { currentUser, showAdminBoard, showCaixaBoard } = this.state;
     return (
       <div>
         <nav className="navbar navbar-expand navbar-dark bg-dark">
@@ -77,14 +81,14 @@ class App extends Component<Props, State> {
                   Venda
                 </Link>
               </li>
-              {showAdminBoard && (
+              {(showAdminBoard || showCaixaBoard) && (
                 <li className="nav-item">
                   <Link to={"/add_caixa"} className="nav-link">
                     Caixa
                   </Link>
                 </li>
               )}
-              {showAdminBoard && (
+              {(showAdminBoard || showCaixaBoard) && (
                 <li className="nav-item">
                   <Link to={"/list_vendas"} className="nav-link">
                     Lista Vendas
