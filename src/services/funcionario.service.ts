@@ -18,6 +18,10 @@ class FuncionarioService {
   edit(id: string, data: FuncionarioDTO) {
     return http.put<FuncionarioDTO>(`/funcionario/${id}`, data);
   }
+
+  addAno(id: string, ano: number) {
+    return http.put<FuncionarioDTO>(`/funcionario/addAno/${id}?ano=${ano}`, null);
+  }
   
   delete(id: string) {
     return http.delete<any>(`/funcionario/${id}`);

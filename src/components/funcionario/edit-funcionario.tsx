@@ -20,6 +20,7 @@ type State = {
   currentFuncionario: FuncionarioDTO,
   anoMes: AnoTrabalhoDTO,
   currentAno: number,
+  newAno: number,
   aba: string,
   message: string;
 }
@@ -30,8 +31,10 @@ export default class EditFuncionario extends Component<Props, State> {
     this.onChangeNome = this.onChangeNome.bind(this);
     this.onChangeValor = this.onChangeValor.bind(this);
     this.onChangeAno = this.onChangeAno.bind(this);
+    this.onChangeNovoAno = this.onChangeNovoAno.bind(this);
     this.getFuncionario = this.getFuncionario.bind(this);
     this.updateFuncionario = this.updateFuncionario.bind(this);
+    this.addNewAno = this.addNewAno.bind(this);
     this.deleteFuncionario = this.deleteFuncionario.bind(this);
     this.voltarLista = this.voltarLista.bind(this);
     this.onChangeHoraInicio1 = this.onChangeHoraInicio1.bind(this);
@@ -53,6 +56,7 @@ export default class EditFuncionario extends Component<Props, State> {
         meses: [],
       },
       currentAno: 0,
+      newAno: 0,
       aba: "",
       message: "",
     }
@@ -91,6 +95,13 @@ export default class EditFuncionario extends Component<Props, State> {
     this.setState({
       currentAno: ano,
       anoMes: this.state.currentFuncionario.anos[this.state.currentFuncionario.anos.length - 1],
+    });
+  }
+
+  onChangeNovoAno(e: ChangeEvent<HTMLInputElement>) {
+    const valor = e.target.valueAsNumber;
+    this.setState({
+      newAno: valor,
     });
   }
 
@@ -207,6 +218,22 @@ export default class EditFuncionario extends Component<Props, State> {
       });
   }
 
+  addNewAno() {
+    FuncionarioService.addAno(this.state.currentFuncionario.cpf, this.state.newAno)
+      .then((response: any) => {
+        this.setState({
+          message: "Sucesso ao adicionar novo ano funcionario!",
+          currentFuncionario: response.data,
+          currentAno: this.state.newAno,
+          anoMes: response.data.anos[response.data.anos.length - 1],
+          aba: "1",
+        });
+      })
+      .catch((e: Error) => {
+        console.log(e);
+      });
+  }
+
   deleteFuncionario() {
     FuncionarioService.delete(this.state.currentFuncionario.cpf)
       .then((response: any) => {
@@ -223,7 +250,7 @@ export default class EditFuncionario extends Component<Props, State> {
   }
 
   render() {
-    const { currentFuncionario, currentAno, anoMes, aba } = this.state;
+    const { currentFuncionario, currentAno, anoMes, aba, newAno } = this.state;
 
     return (
       <div>
@@ -233,39 +260,39 @@ export default class EditFuncionario extends Component<Props, State> {
             <form>
               <div className="row">
                 <div className="form-group col-2">
-                  <label htmlFor="title">Identificador</label>
+                  <label htmlFor="identificador">Identificador</label>
                   <input
                     type="text"
                     className="form-control"
-                    id="title"
+                    id="identificador"
                     value={currentFuncionario.cpf}
                     disabled={true}
                   />
                 </div>
                 <div className="form-group col-6">
-                  <label htmlFor="title">Nome</label>
+                  <label htmlFor="nome">Nome</label>
                   <input
                     type="text"
                     className="form-control"
-                    id="title"
+                    id="nome"
                     value={currentFuncionario.nome}
                     onChange={this.onChangeNome}
                   />
                 </div>
                 <div className="form-group col-2">
-                  <label htmlFor="description">Valor Hora</label>
+                  <label htmlFor="valorHora">Valor Hora</label>
                   <input
                     type="number"
                     className="form-control"
-                    id="description"
+                    id="valorHora"
                     value={currentFuncionario.valorHora}
                     onChange={this.onChangeValor}
                   />
                 </div>
                 <div className="form-group col-2">
-                  <label htmlFor="categoria">Ano</label>
+                  <label htmlFor="ano">Ano</label>
                   <Select
-                    id="categoria"
+                    id="ano"
                     className="form-control"
                     value={currentAno}
                     label="Categoria"
@@ -369,6 +396,26 @@ export default class EditFuncionario extends Component<Props, State> {
                 </TabContext>
                
             </form>
+            <div className="row">
+              <div className="form-group col-2">
+                <label htmlFor="novoAno">Novo Ano</label>
+                <input
+                  type="number"
+                  className="form-control"
+                  id="novoAno"
+                  value={newAno}
+                  onChange={this.onChangeNovoAno}
+                />
+              </div>
+              <div className="form-group col-2">
+                  <button type="submit"
+                    className="btn btn-success"
+                    onClick={this.addNewAno}>
+                      Adicionar Novo Ano
+                  </button>
+              </div>
+            </div>
+
             <div className="row">
               <button
                 className="badge mr-2"
