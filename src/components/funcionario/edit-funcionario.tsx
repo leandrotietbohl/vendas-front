@@ -332,6 +332,7 @@ export default class EditFuncionario extends Component<Props, State> {
                               <div className="col-1">
                                 <TextField id="inicio1" label="Inicio" variant="outlined"
                                                             type="time"
+                                                            focused={true}
                                                             value={dia.horaInicio1}
                                                             onChange={(e) => {this.onChangeHoraInicio1(e, mes.numero, dia.dia)}}
                                                         />
@@ -339,6 +340,7 @@ export default class EditFuncionario extends Component<Props, State> {
                               <div className="col-1">
                                 <TextField id="fim1" label="Fim" variant="outlined"
                                                             type="time"
+                                                            focused={true}
                                                             value={dia.horaFim1}
                                                             onChange={(e) => {this.onChangeHoraFim1(e, mes.numero, dia.dia)}}
                                                         />
@@ -346,6 +348,7 @@ export default class EditFuncionario extends Component<Props, State> {
                               <div className="col-1">
                                 <TextField id="incio2" label="Inicio" variant="outlined"
                                                             type="time"
+                                                            focused={true}
                                                             value={dia.horaInicio2}
                                                             onChange={(e) => {this.onChangeHoraInicio2(e, mes.numero, dia.dia)}}
                                                         />
@@ -353,6 +356,7 @@ export default class EditFuncionario extends Component<Props, State> {
                               <div className="col-1">
                                 <TextField id="fim2" label="Fim" variant="outlined"
                                                             type="time"
+                                                            focused={true}
                                                             value={dia.horaFim2}
                                                             onChange={(e) => {this.onChangeHoraFim2(e, mes.numero, dia.dia)}}
                                                         />
@@ -407,7 +411,7 @@ export default class EditFuncionario extends Component<Props, State> {
                   onChange={this.onChangeNovoAno}
                 />
               </div>
-              <div className="form-group col-2">
+              <div className="form-group col-2" style={{alignSelf: "end"}}>
                   <button type="submit"
                     className="btn btn-success"
                     onClick={this.addNewAno}>
