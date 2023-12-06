@@ -90,9 +90,10 @@ export default class EditFuncionario extends Component<Props, State> {
 
   onChangeAno(event: SelectChangeEvent<number>) {
     const ano = event.target.value as number;
+    
     this.setState({
       currentAno: ano,
-      anoMes: this.state.currentFuncionario.anos[this.state.currentFuncionario.anos.length - 1],
+      anoMes: this.state.currentFuncionario.anos.find((a : AnoTrabalhoDTO) => a.ano == ano) as AnoTrabalhoDTO,
     });
   }
 
@@ -190,7 +191,7 @@ export default class EditFuncionario extends Component<Props, State> {
         this.setState({
           currentFuncionario: response.data,
           currentAno: new Date().getFullYear(),
-          anoMes: response.data.anos[response.data.anos.length - 1],
+          anoMes: response.data.anos.find((a : AnoTrabalhoDTO) => a.ano == new Date().getFullYear()),
           aba: (new Date().getMonth() + 1).toString(),
         });
 
