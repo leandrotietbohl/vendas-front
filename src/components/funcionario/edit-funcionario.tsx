@@ -7,8 +7,6 @@ import FuncionarioDTO from "../../types/funcionario.type";
 import AnoTrabalhoDTO from "../../types/anotrabalho.type";
 import TabContext from "@mui/lab/TabContext";
 import TabPanel from "@mui/lab/TabPanel";
-import { TimeField } from "@mui/x-date-pickers/TimeField";
-import { FieldChangeHandler } from "@mui/x-date-pickers/internals/hooks/useField";
 
 interface RouterProps {
   id: string;

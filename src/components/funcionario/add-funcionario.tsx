@@ -2,10 +2,6 @@ import { Component, ChangeEvent } from "react";
 import { Link, RouteComponentProps } from "react-router-dom";
 import FuncionarioService from "../../services/funcionario.service";
 import FuncionarioDTO from "../../types/funcionario.type";
-import TabContext from "@mui/lab/TabContext";
-import Tab from "@mui/material/Tab";
-import Tabs from "@mui/material/Tabs";
-import { TabPanel } from "@mui/lab";
 
 interface RouterProps {
     id: string;
