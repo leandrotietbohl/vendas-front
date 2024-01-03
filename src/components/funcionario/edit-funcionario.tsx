@@ -188,13 +188,29 @@ export default class EditFuncionario extends Component<Props, State> {
   getFuncionario(id: string) {
     FuncionarioService.get(id)
       .then((response: any) => {
-        this.setState({
-          currentFuncionario: response.data,
-          currentAno: new Date().getFullYear(),
-          anoMes: response.data.anos.find((a : AnoTrabalhoDTO) => a.ano == new Date().getFullYear()),
-          aba: (new Date().getMonth() + 1).toString(),
-        });
-
+        var ano = response.data.anos.find((a : AnoTrabalhoDTO) => a.ano == new Date().getFullYear());
+        if (ano === undefined){
+          FuncionarioService.addAno(response.data.cpf, new Date().getFullYear())
+          .then((response: any) => {
+            ano = response.data.anos[response.data.anos.length - 1];
+            this.setState({
+              currentFuncionario: response.data,
+              currentAno: 2025,
+              anoMes: response.data.anos[response.data.anos.length - 1],
+              aba: (new Date().getMonth() + 1).toString(),
+            });
+          })
+          .catch((e: Error) => {
+            console.log(e);
+          });
+        } else {
+          this.setState({
+            currentFuncionario: response.data,
+            currentAno: new Date().getFullYear(),
+            anoMes: response.data.anos.find((a : AnoTrabalhoDTO) => a.ano == new Date().getFullYear()),
+            aba: (new Date().getMonth() + 1).toString(),
+          });
+        }
       })
       .catch((e: Error) => {
         console.log(e);
