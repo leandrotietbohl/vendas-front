@@ -319,8 +319,8 @@ export default class AddVenda extends Component<Props, State> {
             valorTotal: this.state.valorTotal,
             create: "",
             formaPagamento: this.state.formaPagamento,
-            valorPago: this.state.valorPago,
-            valorTroco: this.state.valorTroco,
+            valorPago: isNaN(this.state.valorPago) ? 0: this.state.valorPago,
+            valorTroco: isNaN(this.state.valorTroco) ? 0: this.state.valorTroco,
             cliente: this.state.cliente,
         };
 
