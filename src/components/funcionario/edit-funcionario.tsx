@@ -160,13 +160,17 @@ export default class EditFuncionario extends Component<Props, State> {
     if (h1 != null && h1.length > 4 && h2 != null && h2.length > 4) {
       var hm1 = h1.split(":");
       var hm2 = h2.split(":");
-      var mt =(+hm2[0])*60+(+hm2[1])-(+hm1[0])*60+(+hm1[1]);
+      var m2 = (+hm2[0])*60+(+hm2[1]);
+      var m1= (+hm1[0])*60+(+hm1[1]);
+      var mt =m2-m1;
       totalTrabalho = mt*valor/60;
     } 
     if (h3 != null && h3.length > 4 && h4 != null && h4.length > 4) {
       var hm1 = h3.split(":");
       var hm2 = h4.split(":");
-      var mt =(+hm2[0])*60+(+hm2[1])-(+hm1[0])*60+(+hm1[1]);
+      var m2 = (+hm2[0])*60+(+hm2[1]);
+      var m1= (+hm1[0])*60+(+hm1[1]);
+      var mt =m2-m1;
       totalTrabalho = totalTrabalho + mt*valor/60;
     }
     var totalDia: number = totalTrabalho;
